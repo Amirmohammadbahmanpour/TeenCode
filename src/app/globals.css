@@ -1,0 +1,45 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  /* رنگ‌های اختصاصی ما که اضافه می‌شوند */
+  --color-sage-50: #f4f7f4;
+  --color-sage-100: #e5ebe5;
+  --color-sage-200: #cedbcd;
+  --color-sage-500: #8ca68b;
+  --color-sage-600: #7a9179;
+  --color-sage-700: #4a5d49;
+
+  --color-stone-50: #fafaf9;
+  --color-stone-100: #f5f5f4;
+  --color-stone-200: #e7e5e4;
+  --color-stone-800: #292524;
+  --color-stone-900: #1c1917;
+
+  /* بقیه متغیرهای قبلی خودش رو اینجا نگه دار... */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  /* ... بقیه خطوط قبلی ... */
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+}
+
+:root {
+  --radius: 0.625rem;
+  
+  /* حالا متغیرهای اصلی رو با رنگ‌های خودمون ست می‌کنیم */
+  --background: #fafaf9; /* همان Stone-50 */
+  --foreground: #1c1917; /* همان Stone-900 */
+  
+  /* رنگ اصلی سایت (Primary) رو همون سبز Sage می‌ذاریم */
+  --primary: oklch(0.68 0.03 145); /* معادل Sage-500 */
+  --primary-foreground: #f4f7f4;
+
+  /* بقیه متغیرهای root رو بذار بمونن */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.147 0.004 49.25);
+  /* ... */
+}
