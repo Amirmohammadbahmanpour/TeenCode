@@ -9,6 +9,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import Link from "next/link"
 
 const menuItems = [
   { title: "داشبورد", url: "/", icon: LayoutDashboard },
@@ -20,10 +21,10 @@ const menuItems = [
 
 export function AppSidebar() {
   return (
-    <Sidebar side="right" collapsible="icon" className="border-l border-sage-200">
-      <SidebarContent className="bg-stone-50">
+    <Sidebar side="right" collapsible="offcanvas" className="border-none bg-sage-soft dark:bg-[#7a9179]">
+      <SidebarContent className="bg-sidebar">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-stone-500 font-bold text-sm mb-4">
+          <SidebarGroupLabel className="text-stone-500 dark:text-sage-soft font-bold text-sm mb-4">
             منوی اصلی
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -31,10 +32,10 @@ export function AppSidebar() {
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild tooltip={item.title} className="hover:bg-sage-100 transition-colors py-6">
-                    <a href={item.url} className="flex items-center gap-3 w-full">
-                      <item.icon className="h-5 w-5 text-sage-600" />
-                      <span className="text-stone-800 font-medium">{item.title}</span>
-                    </a>
+                    <Link href={item.url} className="flex items-center gap-3 w-full cursor-pointer">
+                      <item.icon className="h-5 w-5 text-sage-600 dark:text-sage-soft" />
+                      <span className="text-stone-500 dark:text-sage-soft font-medium">{item.title}</span>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
