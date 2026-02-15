@@ -1,0 +1,37 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  target        String?   
+  currentStep   Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  testResults   TestResult[]
+}
+
+model Lesson {
+  id          String   @id @default(cuid())
+  title       String
+  content     String   @db.Text
+  order       Int      @unique // شماره مرحله (مثلاً ۱، ۲، ۳)
+  requiredScore Int    @default(70) // نمره‌ای که کاربر باید در آزمون قبل گرفته باشد
+  createdAt   DateTime @default(now())
+}
+
+model TestResult {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  score     Int      
+  type      String   
+  answers   Json?    
+  createdAt DateTime @default(now())
+}

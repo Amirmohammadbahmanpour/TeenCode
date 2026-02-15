@@ -6,6 +6,7 @@ import { ModeToggle } from "@/components/mode-toggle";
 import Link from "next/link";
 import Image from "next/image";
 import "./globals.css";
+import Footer from "@/components/contact-us";
 
 // تنظیم فونت استاندارد فارسی
 const vazir = Vazirmatn({
@@ -34,9 +35,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                       کتاب <span className="text-sage-600">تحول</span>
                     </h1>
                     <div className="hidden md:flex items-center gap-6 text-sm font-medium mr-4 text-stone-600 dark:text-stone-400">
-                      <Link href="/" className="hover:text-sage-600 transition-colors">صفحه اصلی</Link>
-                      <Link href="/about" className="hover:text-sage-600 transition-colors">درباره ما</Link>
-                      <Link href="/contact" className="hover:text-sage-600 transition-colors">ارتباط با ما</Link>
+                      <Link href="/" className="hover:text-sage-600 transition-colors">خانه</Link>
+                      <a href="#about-us" className="hover:text-sage-600 transition-colors">درباره ما</a>
+                      <a href="#contact-us" className="hover:text-sage-600 transition-colors">ارتباط با ما</a>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -50,6 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 {/* محتوای متغیر صفحات */}
                 <div className="flex-1 overflow-y-auto overflow-x-hidden">
                   {children}
+                  <Footer />
                 </div>
               </div>
 

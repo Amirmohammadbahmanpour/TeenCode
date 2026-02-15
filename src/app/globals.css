@@ -33,8 +33,14 @@
   --sidebar-border: 240 5% 15%;
   --border: 240 3.7% 20%;
 }
+@layer base {
+  html {
+    scroll-behavior: smooth !important;
+  }
+}
 
 @layer base {
+
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));

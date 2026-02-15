@@ -13,8 +13,8 @@ import Link from "next/link"
 
 const menuItems = [
   { title: "داشبورد", url: "/", icon: LayoutDashboard },
-  { title: "۳۰ روز تحول", url: "/lessons", icon: BookOpen },
-  { title: "پادکست‌ها", url: "/podcasts", icon: Podcast },
+  { title: "۳۰ روز تحول", url: "/pages/courses", icon: BookOpen },
+  { title: "پادکست‌ها", url: "/login", icon: Podcast },
   { title: "نمودار پیشرفت", url: "/progress", icon: BarChart3 },
   { title: "گفتگو با (هوش مصنوعی)", url: "/chat", icon: MessageSquare },
 ]
