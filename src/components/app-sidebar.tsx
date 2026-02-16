@@ -1,4 +1,4 @@
-import { BookOpen, LayoutDashboard, Podcast, BarChart3, MessageSquare, Settings } from "lucide-react"
+import { BookOpen, LayoutDashboard, Podcast, BarChart3, MessageSquare, Settings, Home } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -12,10 +12,11 @@ import {
 import Link from "next/link"
 
 const menuItems = [
-  { title: "داشبورد", url: "/", icon: LayoutDashboard },
+  { title: "خانه", url: "/", icon: Home },
+  { title: "داشبورد", url: "/pages/dashboard", icon: LayoutDashboard },
   { title: "۳۰ روز تحول", url: "/pages/courses", icon: BookOpen },
-  { title: "پادکست‌ها", url: "/login", icon: Podcast },
-  { title: "نمودار پیشرفت", url: "/progress", icon: BarChart3 },
+  { title: "پادکست‌ها", url: "/pages/login", icon: Podcast },
+  { title: " مطالب اموزشی", url: "/pages/lesson/page", icon: BarChart3 },
   { title: "گفتگو با (هوش مصنوعی)", url: "/chat", icon: MessageSquare },
 ]
 
