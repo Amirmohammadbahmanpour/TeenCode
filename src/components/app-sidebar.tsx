@@ -15,8 +15,8 @@ const menuItems = [
   { title: "خانه", url: "/", icon: Home },
   { title: "داشبورد", url: "/pages/dashboard", icon: LayoutDashboard },
   { title: "۳۰ روز تحول", url: "/pages/courses", icon: BookOpen },
-  { title: "پادکست‌ها", url: "/pages/login", icon: Podcast },
-  { title: " مطالب اموزشی", url: "/pages/lesson/page", icon: BarChart3 },
+  { title: "ورود", url: "/pages/login", icon: Podcast },
+  { title: " مطالب اموزشی", url: "/pages/lesson-page", icon: BarChart3 },
   { title: "گفتگو با (هوش مصنوعی)", url: "/chat", icon: MessageSquare },
 ]
 
