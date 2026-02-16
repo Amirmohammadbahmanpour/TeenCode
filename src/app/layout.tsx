@@ -1,8 +1,10 @@
+"use client"
 import { Vazirmatn } from "next/font/google";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ModeToggle } from "@/components/mode-toggle";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import "./globals.css";
@@ -16,7 +18,9 @@ const vazir = Vazirmatn({
 
 // layout.tsx
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
+  const pathname = usePathname();
+  const hideFooterRoutes = ["/pages/login", "/pages/dashboard"];
+  const shouldHideFooter = pathname.startsWith("/pages/dashboard") || pathname === "/pages/login";  return (
     <html lang="fa" dir="rtl" suppressHydrationWarning>
       <body className={`${vazir.className} antialiased overflow-x-hidden`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
@@ -51,7 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 {/* محتوای متغیر صفحات */}
                 <div className="flex-1 overflow-y-auto overflow-x-hidden">
                   {children}
-                  <Footer />
+                  { !shouldHideFooter && <Footer /> }
                 </div>
               </div>
 
