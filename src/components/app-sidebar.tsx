@@ -1,4 +1,5 @@
-import { BookOpen, LayoutDashboard, Podcast, BarChart3, MessageSquare, Settings, Home } from "lucide-react"
+"use client"
+import { LogOut,BookOpen, LayoutDashboard, Podcast, BarChart3, MessageSquare, Settings, Home } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -8,19 +9,52 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarFooter,
+
 } from "@/components/ui/sidebar"
 import Link from "next/link"
+import { supabase } from "@/lib/supabase" // ایمپورت سوپابیس
+import { useRouter } from "next/navigation"
+import { useState , useEffect } from "react"
+import { User } from "@supabase/supabase-js"
 
 const menuItems = [
   { title: "خانه", url: "/", icon: Home },
-  { title: "داشبورد", url: "/pages/dashboard", icon: LayoutDashboard },
-  { title: "۳۰ روز تحول", url: "/pages/courses", icon: BookOpen },
-  { title: "ورود", url: "/pages/login", icon: Podcast },
-  { title: " مطالب اموزشی", url: "/pages/lesson-page", icon: BarChart3 },
-  { title: "گفتگو با (هوش مصنوعی)", url: "/chat", icon: MessageSquare },
+  { title: "داشبورد", url: "/dashboard", icon: LayoutDashboard },
+  { title: "۳۰ روز تحول", url: "/courses", icon: BookOpen },
+  { title: "ورود", url: "/login", icon: Podcast },
+  { title: " مطالب اموزشی", url: "/lesson-page", icon: BarChart3 },
+  { title: "نمودار رشد", url: "/grow", icon: MessageSquare },
+
 ]
 
 export function AppSidebar() {
+  const router = useRouter()
+  const [user, setUser] = useState<User | null>(null)
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user: currentUser } } = await supabase.auth.getUser()
+      setUser(currentUser)
+    }
+    checkUser()
+  
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null)
+    })
+  
+    return () => {
+      authListener.subscription.unsubscribe()
+    }
+  }, [])
+  
+  const handleSignOut = async () => {
+    const { error } = await supabase.auth.signOut()
+    if (!error) {
+      router.push("/login")
+      router.refresh() // برای پاک کردن کش استیت‌های قبلی
+    }
+  }
   return (
     <Sidebar side="right" collapsible="offcanvas" className="border-none bg-sage-soft dark:bg-[#7a9179]">
       <SidebarContent className="bg-sidebar">
@@ -44,6 +78,21 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      {user && (
+        <SidebarFooter className="bg-sidebar p-4 border-t border-stone-200/50 dark:border-stone-800/50">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton 
+                onClick={handleSignOut}
+                className="flex items-center gap-3 w-full py-6 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors cursor-pointer"
+              >
+                <LogOut className="h-5 w-5" />
+                <span className="font-bold">خروج از حساب</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
+      )}
     </Sidebar>
   )
 }

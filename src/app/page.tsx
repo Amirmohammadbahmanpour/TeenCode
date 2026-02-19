@@ -8,7 +8,7 @@ import { Lightbulb, Target, Rocket , Plus , X } from "lucide-react";
 import AboutUs from "@/components/about-us";
 import FinalCTA from "@/components/final-cta";
 import Footer from "@/components/contact-us";
-import LoginPage from "./pages/login/page";
+import LoginPage from "./login/page";
 const stepsData = [
   { 
     title: "کشف استعداد", 
@@ -44,7 +44,7 @@ export default function Home() {
             </p>
 
             <div className="flex flex-wrap justify-center lg:justify-start gap-4 pt-4">
-              <Link href="pages/login" className="bg-sage-600 hover:bg-sage-700 text-white px-10 py-4 rounded-full font-bold transition-all shadow-lg shadow-sage-200/50 hover:-translate-y-1">
+              <Link href="/login" className="bg-sage-600 hover:bg-sage-700 text-white px-10 py-4 rounded-full font-bold transition-all shadow-lg shadow-sage-200/50 hover:-translate-y-1">
                 شروع کنید
               </Link>
               <button className="border-2 border-stone-300 dark:border-stone-700 px-10 py-4 rounded-full font-bold text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-900 transition-all">

@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@prisma/client": "^6.19.2",
+    "@supabase/auth-helpers-nextjs": "^0.15.0",
+    "@supabase/supabase-js": "^2.97.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^17.3.1",

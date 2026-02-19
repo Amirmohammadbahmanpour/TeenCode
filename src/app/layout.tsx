@@ -19,8 +19,8 @@ const vazir = Vazirmatn({
 // layout.tsx
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const hideFooterRoutes = ["/pages/login", "/pages/dashboard"];
-  const shouldHideFooter = pathname.startsWith("/pages/dashboard") || pathname === "/pages/login";  return (
+  const hideFooterRoutes = [ "/pages/grow" ,"/pages/login", "/pages/dashboard"];
+  const shouldHideFooter = hideFooterRoutes.some(route => pathname.startsWith(route));  return (
     <html lang="fa" dir="rtl" suppressHydrationWarning>
       <body className={`${vazir.className} antialiased overflow-x-hidden`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
