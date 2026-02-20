@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
-import { Vazirmatn } from "next/font/google";
+import AlreadyLoggedIn from "@/components/AlreadyLoggedIn";
 import { User, Calendar, GraduationCap, Banknote, Users, Baby, ArrowLeft } from "lucide-react";
 
 export default function CompleteProfile() {
@@ -12,26 +12,37 @@ export default function CompleteProfile() {
     const [economic, setEconomic] = useState("");
     const [childrenCount, setChildrenCount] = useState("");
     const [childAge, setChildAge] = useState("");
-    const [loading, setLoading] = useState(false);
+    
+    const [loading, setLoading] = useState(false); // لودینگ دکمه ثبت
+    const [checkingAuth, setCheckingAuth] = useState(true); // لودینگ کل صفحه
+    const [isOnboarded, setIsOnboarded] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
-        const checkOnboarding = async () => {
+        const checkStatus = async () => {
+            // ۱. گرفتن اطلاعات کاربر فعلی
             const { data: { user } } = await supabase.auth.getUser();
+
             if (!user) {
                 router.push("/login");
                 return;
             }
+
+            // ۲. چک کردن اینکه آیا قبلاً پروفایل را پر کرده یا نه
             const { data: profile } = await supabase
                 .from('profiles')
                 .select('is_onboarded')
                 .eq('id', user.id)
                 .single();
+
             if (profile?.is_onboarded) {
-                router.push("/dashboard");
+                setIsOnboarded(true);
             }
+            
+            setCheckingAuth(false);
         };
-        checkOnboarding();
+
+        checkStatus();
     }, [router]);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -41,7 +52,6 @@ export default function CompleteProfile() {
         const { data: { user } } = await supabase.auth.getUser();
 
         if (!user) {
-            alert("ابتدا باید وارد شوید");
             router.push("/login");
             return;
         }
@@ -61,108 +71,117 @@ export default function CompleteProfile() {
 
         if (error) {
             alert("خطا در ذخیره: " + error.message);
+            setLoading(false);
         } else {
             alert("اطلاعات با موفقیت ثبت شد!");
             router.push("/dashboard");
         }
-        setLoading(false);
     };
-    
+
+    // در حال بررسی وضعیت کاربر
+    if (checkingAuth) return null;
+
     return (
-        <div className="min-h-screen flex items-center justify-center bg-stone-50 dark:bg-stone-950 font-[vazir] p-6" dir="rtl">
-            <div className="w-full max-w-xl bg-white dark:bg-stone-900 p-8 md:p-12 rounded-[2.5rem] shadow-xl border border-stone-200/50 dark:border-stone-800/50 relative overflow-hidden">
-                {/* دکوراسیون پس‌زمینه کارت */}
-                <div className="absolute top-0 left-0 w-32 h-32 bg-sage-500/10 rounded-full blur-3xl -ml-16 -mt-16"></div>
+        <div className="min-h-screen flex items-center justify-center bg-stone-50 dark:bg-stone-950 p-6 font-sans" dir="rtl">
+            {isOnboarded ? (
+                // اگر قبلاً پر کرده بود، پیام ورود مجدد را نشان بده
+                <AlreadyLoggedIn />
+            ) : (
+                // اگر پروفایل ناقص بود، فرم را نشان بده
+                <div className="w-full max-w-xl bg-white dark:bg-stone-900 p-8 md:p-12 rounded-[2.5rem] shadow-xl border border-stone-200/50 dark:border-stone-800/50 relative overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    {/* دکوراسیون پس‌زمینه */}
+                    <div className="absolute top-0 left-0 w-32 h-32 bg-sage-500/10 rounded-full blur-3xl -ml-16 -mt-16"></div>
 
-                <div className="relative z-10">
-                    <div className="text-center mb-10">
-                        <h2 className="text-3xl font-black text-stone-800 dark:text-stone-100">تکمیل پروفایل</h2>
-                        <p className="text-stone-500 dark:text-stone-400 mt-2">لطفاً اطلاعات زیر را برای شخصی‌سازی مسیر تحول خود تکمیل کنید</p>
+                    <div className="relative z-10">
+                        <div className="text-center mb-10">
+                            <h2 className="text-3xl font-black text-stone-800 dark:text-stone-100 italic">تین کد</h2>
+                            <h2 className="text-2xl font-bold text-stone-700 dark:text-stone-200 mt-2">تکمیل پروفایل</h2>
+                            <p className="text-stone-500 dark:text-stone-400 mt-2 text-sm">لطفاً اطلاعات زیر را برای شخصی‌سازی مسیر تحول خود تکمیل کنید</p>
+                        </div>
+
+                        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* نام و نام خانوادگی */}
+                            <div className="relative md:col-span-2">
+                                <span className="absolute inset-y-0 right-4 flex items-center text-stone-400"><User size={20} /></span>
+                                <input
+                                    type="text" required placeholder="نام و نام خانوادگی"
+                                    className="w-full bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 rounded-2xl py-4 pr-12 pl-4 text-right focus:ring-2 focus:ring-sage-500 outline-none transition-all dark:text-white text-sm"
+                                    onChange={e => setFullName(e.target.value)}
+                                />
+                            </div>
+
+                            {/* سن */}
+                            <div className="relative">
+                                <span className="absolute inset-y-0 right-4 flex items-center text-stone-400"><Calendar size={20} /></span>
+                                <input
+                                    type="number" required placeholder="سن شما"
+                                    className="w-full bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 rounded-2xl py-4 pr-12 pl-4 text-right focus:ring-2 focus:ring-sage-500 outline-none transition-all dark:text-white text-sm"
+                                    onChange={e => setAge(e.target.value)}
+                                />
+                            </div>
+
+                            {/* سطح تحصیلات */}
+                            <div className="relative">
+                                <span className="absolute inset-y-0 right-4 flex items-center text-stone-400"><GraduationCap size={20} /></span>
+                                <select
+                                    required className="w-full bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 rounded-2xl py-4 pr-12 pl-4 text-right focus:ring-2 focus:ring-sage-500 outline-none transition-all dark:text-white appearance-none text-sm"
+                                    onChange={e => setEducation(e.target.value)}
+                                >
+                                    <option value="">سطح تحصیلات</option>
+                                    <option value="diploma">دیپلم</option>
+                                    <option value="bachelor">کارشناسی</option>
+                                    <option value="master">ارشد و بالاتر</option>
+                                </select>
+                            </div>
+
+                            {/* وضعیت اقتصادی */}
+                            <div className="relative">
+                                <span className="absolute inset-y-0 right-4 flex items-center text-stone-400"><Banknote size={20} /></span>
+                                <select
+                                    required className="w-full bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 rounded-2xl py-4 pr-12 pl-4 text-right focus:ring-2 focus:ring-sage-500 outline-none transition-all dark:text-white appearance-none text-sm"
+                                    onChange={e => setEconomic(e.target.value)}
+                                >
+                                    <option value="">وضعیت اقتصادی</option>
+                                    <option value="average">متوسط</option>
+                                    <option value="good">خوب</option>
+                                    <option value="excellent">عالی</option>
+                                </select>
+                            </div>
+
+                            {/* تعداد فرزندان */}
+                            <div className="relative">
+                                <span className="absolute inset-y-0 right-4 flex items-center text-stone-400"><Users size={20} /></span>
+                                <input
+                                    type="number" required placeholder="تعداد فرزندان"
+                                    className="w-full bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 rounded-2xl py-4 pr-12 pl-4 text-right focus:ring-2 focus:ring-sage-500 outline-none transition-all dark:text-white text-sm"
+                                    onChange={e => setChildrenCount(e.target.value)}
+                                />
+                            </div>
+
+                            {/* سن فرزند */}
+                            <div className="relative md:col-span-2">
+                                <span className="absolute inset-y-0 right-4 flex items-center text-stone-400"><Baby size={20} /></span>
+                                <input
+                                    type="number" required placeholder="سن فرزند (یا بزرگترین فرزند)"
+                                    className="w-full bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 rounded-2xl py-4 pr-12 pl-4 text-right focus:ring-2 focus:ring-sage-500 outline-none transition-all dark:text-white text-sm"
+                                    onChange={e => setChildAge(e.target.value)}
+                                />
+                            </div>
+
+                            {/* دکمه ثبت */}
+                            <div className="md:col-span-2 pt-4">
+                                <button
+                                    disabled={loading}
+                                    className="w-full bg-sage-600 hover:bg-sage-700 text-white py-4 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-sage-200/50 dark:shadow-none active:scale-[0.98]"
+                                >
+                                    {loading ? "در حال ذخیره اطلاعات..." : "تایید و ورود به پنل"}
+                                    {!loading && <ArrowLeft size={20} />}
+                                </button>
+                            </div>
+                        </form>
                     </div>
-
-                    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        
-                        {/* نام و نام خانوادگی */}
-                        <div className="relative md:col-span-2">
-                            <span className="absolute inset-y-0 right-4 flex items-center text-stone-400"><User size={20} /></span>
-                            <input 
-                                type="text" required placeholder="نام و نام خانوادگی"
-                                className="w-full bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 rounded-2xl py-4 pr-12 pl-4 text-right focus:ring-2 focus:ring-sage-500 outline-none transition-all dark:text-white"
-                                onChange={e => setFullName(e.target.value)}
-                            />
-                        </div>
-
-                        {/* سن */}
-                        <div className="relative">
-                            <span className="absolute inset-y-0 right-4 flex items-center text-stone-400"><Calendar size={20} /></span>
-                            <input 
-                                type="number" required placeholder="سن شما"
-                                className="w-full bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 rounded-2xl py-4 pr-12 pl-4 text-right focus:ring-2 focus:ring-sage-500 outline-none transition-all dark:text-white"
-                                onChange={e => setAge(e.target.value)}
-                            />
-                        </div>
-
-                        {/* سطح تحصیلات */}
-                        <div className="relative">
-                            <span className="absolute inset-y-0 right-4 flex items-center text-stone-400"><GraduationCap size={20} /></span>
-                            <select 
-                                required className="w-full bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 rounded-2xl py-4 pr-12 pl-4 text-right focus:ring-2 focus:ring-sage-500 outline-none transition-all dark:text-white appearance-none"
-                                onChange={e => setEducation(e.target.value)}
-                            >
-                                <option value="">سطح تحصیلات</option>
-                                <option value="diploma">دیپلم</option>
-                                <option value="bachelor">کارشناسی</option>
-                                <option value="master">ارشد و بالاتر</option>
-                            </select>
-                        </div>
-
-                        {/* وضعیت اقتصادی */}
-                        <div className="relative">
-                            <span className="absolute inset-y-0 right-4 flex items-center text-stone-400"><Banknote size={20} /></span>
-                            <select 
-                                required className="w-full bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 rounded-2xl py-4 pr-12 pl-4 text-right focus:ring-2 focus:ring-sage-500 outline-none transition-all dark:text-white appearance-none"
-                                onChange={e => setEconomic(e.target.value)}
-                            >
-                                <option value="">وضعیت اقتصادی</option>
-                                <option value="average">متوسط</option>
-                                <option value="good">خوب</option>
-                                <option value="excellent">عالی</option>
-                            </select>
-                        </div>
-
-                        {/* تعداد فرزندان */}
-                        <div className="relative">
-                            <span className="absolute inset-y-0 right-4 flex items-center text-stone-400"><Users size={20} /></span>
-                            <input 
-                                type="number" required placeholder="تعداد فرزندان"
-                                className="w-full bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 rounded-2xl py-4 pr-12 pl-4 text-right focus:ring-2 focus:ring-sage-500 outline-none transition-all dark:text-white"
-                                onChange={e => setChildrenCount(e.target.value)}
-                            />
-                        </div>
-
-                        {/* سن فرزند (بزرگترین یا کوچکترین - طبق نیاز سایتت) */}
-                        <div className="relative md:col-span-2">
-                            <span className="absolute inset-y-0 right-4 flex items-center text-stone-400"><Baby size={20} /></span>
-                            <input 
-                                type="number" required placeholder="سن فرزند (یا فرزندان)"
-                                className="w-full bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 rounded-2xl py-4 pr-12 pl-4 text-right focus:ring-2 focus:ring-sage-500 outline-none transition-all dark:text-white"
-                                onChange={e => setChildAge(e.target.value)}
-                            />
-                        </div>
-
-                        {/* دکمه ثبت نهایی */}
-                        <div className="md:col-span-2 pt-4">
-                            <button 
-                                disabled={loading} 
-                                className="w-full bg-sage-600 hover:bg-sage-700 text-white py-4 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-sage-200/50 dark:shadow-none"
-                            >
-                                {loading ? "در حال ذخیره اطلاعات..." : "تایید و ورود به پنل"}
-                                {!loading && <ArrowLeft size={20} />}
-                            </button>
-                        </div>
-                    </form>
                 </div>
-            </div>
+            )}
         </div>
     );
 }
