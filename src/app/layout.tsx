@@ -5,6 +5,8 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ModeToggle } from "@/components/mode-toggle";
 import { usePathname } from "next/navigation";
+import { supabase } from "@/lib/supabase";
+import { useEffect , useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import "./globals.css";
@@ -19,7 +21,7 @@ const vazir = Vazirmatn({
 // layout.tsx
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const hideFooterRoutes = [ "/pages/grow" ,"/pages/login", "/pages/dashboard"];
+  const hideFooterRoutes = [ "/grow" ,"/login", "/dashboard"];
   const shouldHideFooter = hideFooterRoutes.some(route => pathname.startsWith(route));  return (
     <html lang="fa" dir="rtl" suppressHydrationWarning>
       <body className={`${vazir.className} antialiased overflow-x-hidden`}>
