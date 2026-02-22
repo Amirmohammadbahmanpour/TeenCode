@@ -1,132 +1,97 @@
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
-import Image from "next/image"
-import ChapterList from "./ChapterList"
+import { createClient } from "@/lib/supabaseServer";
+import { redirect } from "next/navigation";
+import ChapterList from "./ChapterList";
+import Image from "next/image";
 
-// --- Interfaces ---
-interface DBPlacement {
-    id: number;
-    title: string;
-    order_index: number;
-}
-
-interface DBCategory {
-    id: number;
-    title: string;
-    image_url: string | null;
-    lessons: DBPlacement[];
-}
-
+// تعریف اینترفیس‌ها
 export interface Lesson {
-    id: number;
-    title: string;
+  id: string;
+  title: string;
+  order_index: number;
 }
 
 export interface Chapter {
-    id: number;
-    title: string;
-    image_url: string | null;
-    lessons: Lesson[];
+  id: number;
+  title: string;
+  lessons: Lesson[];
 }
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function CoursesPage() {
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        { cookies: { getAll() { return cookieStore.getAll() } } }
-    )
+    const supabase = await createClient();
 
-    // ۱. دریافت اطلاعات یوزر
     const { data: { user } } = await supabase.auth.getUser();
+    if (!user) redirect("/login");
 
-    // ۲. دریافت فصل‌ها و دروس
-    const { data: categories } = await supabase
+    // کوئری‌ها
+    const { data: examData } = await supabase
+        .from("user_exams")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("exam_type", "pretest");
+
+    const { data: chaptersData } = await supabase
         .from("categories")
         .select(`
             id,
             title,
-            image_url,
-            lessons ( id, title, order_index )
+            lessons (
+                id,
+                title,
+                order_index
+            )
         `)
-        .order("order_index", { ascending: true }) as { data: DBCategory[] | null };
+        .order("order_index", { ascending: true });
 
-    // ۳. متغیرهای وضعیت کاربر
-    let completedLessonIds: number[] = [];
-    let entranceExamPassed = false;
-    let finalExamPassed = false;
+    const { data: progressData } = await supabase
+        .from("user_progress")
+        .select("lesson_id")
+        .eq("user_id", user.id);
 
-    if (user) {
-        // الف) دریافت دروس تمام شده
-        const { data: progress } = await supabase
-            .from("user_progress")
-            .select("lesson_id")
-            .eq("user_id", user.id)
-            .eq("is_completed", true);
-
-        if (progress) {
-            completedLessonIds = progress.map(p => p.lesson_id);
-        }
-
-        // ب) دریافت وضعیت آزمون‌ها از جدول جدید
-        const { data: examData } = await supabase
-            .from('user_exams')
-            .select('exam_type, is_passed')
-            .eq('user_id', user.id);
-
-        if (examData) {
-            entranceExamPassed = examData.find(e => e.exam_type === 'entrance')?.is_passed || false;
-            finalExamPassed = examData.find(e => e.exam_type === 'final')?.is_passed || false;
-        }
-    }
-
-    // ۴. فرمت کردن داده‌ها برای کامپوننت
-    const formattedChapters: Chapter[] = (categories ?? []).map((cat): Chapter => ({
-        id: cat.id,
-        title: cat.title,
-        image_url: cat.image_url,
-        lessons: (cat.lessons ?? [])
-            .sort((a, b) => a.order_index - b.order_index)
-            .map((l): Lesson => ({ id: l.id, title: l.title }))
-    }));
+    const chapters = (chaptersData as unknown as Chapter[]) || [];
+    const completedLessonIds = (progressData || []).map(p => p.lesson_id);
+    const entranceExamPassed = Array.isArray(examData) && examData.length > 0;
 
     return (
-        <div className="min-h-screen bg-white dark:bg-stone-950 pb-20 text-right" dir="rtl">
-            <header className="relative w-full h-[35vh] md:h-[40vh]">
-                <Image
-                    src="/course-banner.png"
+        <div className="min-h-screen bg-stone-50 dark:bg-stone-950 pb-20" dir="rtl">
+            
+            {/* بخش بنر و هدر */}
+            <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+                <Image 
+                    src="/course-banner.png" // نام فایل بنر خود را اینجا جایگزین کنید
                     alt="Banner"
                     fill
-                    priority
                     className="object-cover"
+                    priority
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-stone-950" />
-            </header>
+                {/* سایه (Gradient) پایین عکس برای محو شدن در پس‌زمینه */}
+                <div className="absolute inset-0 bg-gradient-to-t from-stone-50 via-stone-50/20 to-transparent dark:from-stone-950 dark:via-stone-950/20" />
+            </div>
 
-            <main className="max-w-4xl mx-auto px-6 relative z-10 -mt-16 md:-mt-20">
-                <div className="flex flex-col items-center md:items-start text-center md:text-right">
-                    <h1 className="text-3xl md:text-5xl font-black text-stone-900 dark:text-stone-100 mb-6 leading-tight">
-                        نقشه راه تحول ۳۰ روزه
-                    </h1>
-
-                    <p className="text-base md:text-lg text-stone-600 dark:text-stone-400 leading-8 md:leading-9 font-medium max-w-3xl mb-12">
-                        {entranceExamPassed
-                            ? "تبریک! شما آزمون ورودی را با موفقیت گذراندید. حالا مسیر یادگیری برای شما باز شده است."
-                            : "برای شروع اولین فصل، ابتدا باید در آزمون ورودی شرکت کنید تا سطح آمادگی شما سنجیده شود."
-                        }
-                    </p>
+            {/* بخش محتوای متنی هدر */}
+            <div className="max-w-3xl mx-auto px-6 -mt-20 relative z-10 mb-12">
+                <div className="inline-block px-4 py-2 bg-sage-600 text-white text-xs font-black rounded-xl mb-4 shadow-lg">
+                    دوره جامع
                 </div>
+                <h1 className="text-4xl md:text-5xl font-black text-stone-900 dark:text-stone-50 mb-4 transition-all">
+                    مسیر تحول من
+                </h1>
+                <p className="text-lg text-stone-600 dark:text-stone-400 leading-relaxed font-medium">
+                    اینجا نقشه راه اختصاصی شماست. هر مرحله را با دقت پشت سر بگذارید تا به اهداف بزرگ خود دست پیدا کنید. تداوم، رمز پیروزی شما در این مسیر است.
+                </p>
+            </div>
 
-                <div className="w-full mx-auto">
-                    {/* پاس دادن تمام وضعیت‌ها به لیست فصل‌ها */}
-                    <ChapterList
-                        chapters={formattedChapters}
-                        completedLessonIds={completedLessonIds}
-                        entranceExamPassed={entranceExamPassed}
-                        finalExamPassed={finalExamPassed}
-                    />
-                </div>
-            </main>
+            {/* لیست فصل‌ها */}
+            <div className="max-w-3xl mx-auto px-6">
+                <ChapterList
+                    chapters={chapters}
+                    completedLessonIds={completedLessonIds}
+                    entranceExamPassed={entranceExamPassed}
+                    finalExamPassed={false} 
+                />
+            </div>
         </div>
     );
 }
