@@ -9,6 +9,7 @@ import { supabase } from "@/lib/supabase";
 import { useEffect , useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { UserCircle } from "lucide-react";
 import "./globals.css";
 import Footer from "@/components/contact-us";
 
@@ -48,9 +49,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   </div>
                   <div className="flex items-center gap-3">
                     <ModeToggle />
-                    <div className="h-9 w-9 rounded-full bg-sage-200 dark:bg-stone-800 flex items-center justify-center text-xs font-bold text-sage-800 dark:text-sage-200 border border-sage-300/30">
-                      ر ت
-                    </div>
+                    <Link href="/dashboard" className="h-9 w-9 rounded-full bg-sage-200 dark:bg-stone-800 flex items-center justify-center text-xs font-bold text-sage-800 dark:text-sage-200">
+                        <UserCircle />
+                    </Link>
                   </div>
                 </nav>
 

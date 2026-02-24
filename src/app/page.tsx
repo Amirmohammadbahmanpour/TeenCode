@@ -79,17 +79,17 @@ export default async function Home() {
 
             <div className="flex flex-wrap justify-center lg:justify-start gap-4 pt-4">
               <Link
-                href={isLoggedIn ? "/dashboard" : "/login"}
+                href={isLoggedIn ? "/dashboard" : "/register"}
                 className="bg-sage-600 hover:bg-sage-700 text-white px-10 py-4 rounded-full font-bold transition-all shadow-lg shadow-sage-200/50 hover:-translate-y-1"
               >
                 {isLoggedIn ? "ورود به داشبورد" : "شروع کنید"}
               </Link>
 
               <Link
-                href={isLoggedIn ? "/courses" : "/consulting"}
+                href={isLoggedIn ? "/courses" : "/login"}
                 className="border-2 border-stone-300 dark:border-stone-700 px-10 py-4 rounded-full font-bold text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-900 transition-all text-center"
               >
-                {isLoggedIn ? "مشاهده دوره‌ها" : "مشاوره رایگان"}
+                {isLoggedIn ? "مشاهده دوره‌ها" : "ورود"}
               </Link>
             </div>
           </div>
