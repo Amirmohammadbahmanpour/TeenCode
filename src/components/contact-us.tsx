@@ -43,7 +43,7 @@ export default function Footer() {
                             <li><Link href="/" className="hover:text-sage-600 transition-colors">صفحه اصلی</Link></li>
                             <li><a href="#about-us" className="hover:text-sage-600 transition-colors">داستان ما</a></li>
                             <li><a href="#FAQ" className="hover:text-sage-600 transition-colors">سوالات متداول</a></li>
-                            <li><a href="/blog" className="hover:text-sage-600 transition-colors">وبلاگ</a></li>
+                            <li><Link href="/blog" className="hover:text-sage-600 transition-colors">وبلاگ</Link></li>
                         </ul>
                     </div>
 
