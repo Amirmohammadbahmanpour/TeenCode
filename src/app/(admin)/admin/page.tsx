@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { FileText, Users, MessageSquare, TrendingUp } from "lucide-react";
-
+import { redirect } from "next/navigation";
 // تایپ برای کارت‌های داشبورد
 interface StatCardProps {
   title: string;
@@ -8,7 +8,15 @@ interface StatCardProps {
   icon: React.ElementType;
   color: string;
 }
+const { data: { user } } = await supabase.auth.getUser()
 
+  // ۲. شرط ادمین بودن (مثلاً چک کردن ایمیل خاص)
+  const isAdmin = user?.email === "admin@yoursite.com"; 
+
+  // ۳. اگر ادمین نبود، ریدایرکت به صفحه اصلی
+  if (!isAdmin) {
+    redirect('/')
+  }
 function StatCard({ title, value, icon: Icon, color }: StatCardProps) {
   return (
     <div className="bg-white dark:bg-stone-900 p-6 rounded-[2rem] border border-stone-200 dark:border-stone-800 shadow-sm">
