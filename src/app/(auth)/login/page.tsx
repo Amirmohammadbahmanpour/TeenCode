@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { ArrowLeft, Mail, Lock, ChevronRight } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import AlreadyLoggedIn from "@/components/AlreadyLoggedIn";
 import Link from "next/link";
 
@@ -28,37 +29,53 @@ export default function LoginPage() {
 
     // ۲. منطق هوشمند ورود و ثبت‌نام همزمان
     const handleAuth = async (e: React.FormEvent) => {
+        // ۱. همیشه اولین کار: جلوگیری از ریفرش شدن صفحه
         e.preventDefault();
-        setLoading(true);
-
-        // تلاش برای ورود
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        });
-
-        if (!signInError) {
-            router.push("/complete-profile");
+    
+        // ۲. بررسی اعتبار اولیه
+        if (password.length < 6) {
+            toast.error("رمز عبور باید حداقل ۶ کاراکتر باشد");
+            // نیازی به setLoading(false) نیست چون هنوز true نشده
             return;
         }
-
-        // اگر کاربر وجود نداشت، ثبت‌نام کن
-        if (signInError.message.includes("Invalid login credentials")) {
-            const { error: signUpError } = await supabase.auth.signUp({
+    
+        // ۳. شروع عملیات لودینگ
+        setLoading(true);
+    
+        try {
+            // تلاش برای ورود
+            const { error: signInError } = await supabase.auth.signInWithPassword({
                 email,
                 password,
             });
-
-            if (signUpError) {
-                alert("خطا: " + signUpError.message);
-            } else {
-                alert("حساب کاربری جدید ساخته شد.");
+    
+            if (!signInError) {
+                toast.success("خوش آمدید! در حال انتقال...");
                 router.push("/complete-profile");
+                return;
             }
-        } else {
-            alert("خطا در ورود: " + signInError.message);
+    
+            // اگر کاربر پیدا نشد، ثبت‌نام کن
+            if (signInError.message.includes("Invalid login credentials")) {
+                const { error: signUpError } = await supabase.auth.signUp({
+                    email,
+                    password,
+                });
+    
+                if (signUpError) {
+                    toast.error("خطا در ثبت‌نام: " + signUpError.message);
+                } else {
+                    toast.success("حساب کاربری جدید ساخته شد ✨");
+                    router.push("/complete-profile");
+                }
+            } else {
+                toast.error("خطا در ورود: " + signInError.message);
+            }
+        } catch (err) {
+            toast.error("خطای غیرمنتظره‌ای رخ داد");
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     // اگر در حال چک کردن وضعیت کاربریم، چیزی نشان نده (یا اسپینر بگذار)
@@ -117,11 +134,11 @@ export default function LoginPage() {
                                         value={password} onChange={(e) => setPassword(e.target.value)}
                                     />
                                 </div>
-                                <button 
-                                    disabled={loading} 
+                                <button
+                                    disabled={loading}
                                     className="w-full bg-sage-600 hover:bg-sage-700 text-white py-4 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-sage-200/50 dark:shadow-none"
                                 >
-                                    {loading ? "در حال بررسی..." : "ورود یا ثبت‌نام"} 
+                                    {loading ? "در حال بررسی..." : "ورود یا ثبت‌نام"}
                                     {!loading && <ArrowLeft size={20} />}
                                 </button>
                             </form>

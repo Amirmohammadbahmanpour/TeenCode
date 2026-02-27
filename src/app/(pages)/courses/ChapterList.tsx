@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ChevronDown, Sprout, CheckCircle2, Lock, PlayCircle, ChevronLeft } from "lucide-react";
+import { ChevronDown, Sprout, CheckCircle2, Lock, PlayCircle, ChevronLeft, Sparkles } from "lucide-react";
 import { Chapter } from "./page";
 
 interface Props {
@@ -13,7 +13,7 @@ interface Props {
 }
 
 export default function ChapterList({ chapters, completedLessonIds, entranceExamPassed, finalExamPassed }: Props) {
-    // باز کردن فصل اول به صورت پیش‌فرض (یا اگر آزمون داده شده، فصل دوم)
+    // باز کردن فصل اول یا فصلی که کاربر در آن قرار دارد
     const [openChapterId, setOpenChapterId] = useState<number | null>(
         entranceExamPassed && chapters.length > 1 ? chapters[1].id : chapters[0]?.id || null
     );
@@ -23,20 +23,30 @@ export default function ChapterList({ chapters, completedLessonIds, entranceExam
             {chapters.map((chapter, index) => {
                 const isOpen = openChapterId === chapter.id;
                 const isFirstItem = index === 0;
-
-                // منطق قفل‌ها
+                const isFinalExamRow = chapter.slug === 'final-test';
+                
+                // منطق داینامیک قفل‌ها
                 let isLocked = false;
                 if (isFirstItem) {
-                    isLocked = false;
+                    isLocked = false; // آزمون ورودی همیشه باز است
                 } else if (index === 1) {
                     isLocked = !entranceExamPassed;
+                } else if (isFinalExamRow) {
+                    // آزمون نهایی فقط وقتی باز می‌شود که تمام دروس تمام فصل‌های آموزشی قبل از آن تکمیل شده باشند
+                    const educationChapters = chapters.slice(1, index);
+                    const allLessonsDone = educationChapters.every(ch => 
+                        ch.lessons.every(l => completedLessonIds.includes(l.id))
+                    );
+                    isLocked = !allLessonsDone;
                 } else {
+                    // فصل‌های معمولی: اگر فصل قبلی تمام شده باشد باز می‌شوند
                     const prevChapter = chapters[index - 1];
                     const isPrevChapterDone = prevChapter.lessons.every(l => completedLessonIds.includes(l.id));
                     isLocked = !isPrevChapterDone && !finalExamPassed;
                 }
 
-                const isExamRow = index === 0;
+                // ردیف‌هایی که استایل "باکس آزمون" دارند (اولین و آخرین)
+                const isSpecialRow = isFirstItem || isFinalExamRow;
 
                 return (
                     <div
@@ -58,8 +68,10 @@ export default function ChapterList({ chapters, completedLessonIds, entranceExam
                                         : "bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 shadow-lg"}`}>
                                     {isLocked ? (
                                         <Lock size={20} />
-                                    ) : (entranceExamPassed && isFirstItem ? (
+                                    ) : (isFirstItem && entranceExamPassed ? (
                                         <CheckCircle2 size={22} className="text-sage-500" />
+                                    ) : isFinalExamRow && finalExamPassed ? (
+                                        <Sparkles size={22} className="text-amber-500" />
                                     ) : (
                                         <span className="font-black text-lg">{index + 1}</span>
                                     ))}
@@ -79,41 +91,41 @@ export default function ChapterList({ chapters, completedLessonIds, entranceExam
                         <div className={`grid transition-all duration-300 ease-in-out ${isOpen && !isLocked ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
                             <div className="min-h-0">
                                 <div className="p-6 pt-0 space-y-3">
-                                    {isExamRow ? (
-                                        /* بخش آزمون ورودی */
-                                        <div className="p-8 bg-sage-50 dark:bg-sage-900/10 rounded-[2rem] border-2 border-sage-100 dark:border-sage-800/30 text-center space-y-4">
-                                            {entranceExamPassed ? (
+                                    {isSpecialRow ? (
+                                        /* بخش آزمون (ورودی یا نهایی) */
+                                        <div className={`p-8 rounded-[2rem] border-2 text-center space-y-4 ${isFinalExamRow ? 'bg-amber-50/50 dark:bg-amber-900/10 border-amber-100/50' : 'bg-sage-50 dark:bg-sage-900/10 border-sage-100'}`}>
+                                            {((isFirstItem && entranceExamPassed) || (isFinalExamRow && finalExamPassed)) ? (
                                                 <>
-                                                    <div className="w-16 h-16 bg-sage-100 dark:bg-sage-900/50 rounded-2xl flex items-center justify-center mx-auto shadow-sm">
-                                                        <CheckCircle2 size={32} className="text-sage-600 dark:text-sage-400" />
+                                                    <div className="w-16 h-16 bg-white dark:bg-stone-800 rounded-2xl flex items-center justify-center mx-auto shadow-sm">
+                                                        <CheckCircle2 size={32} className={isFinalExamRow ? "text-amber-600" : "text-sage-600"} />
                                                     </div>
                                                     <div>
-                                                        <h4 className="text-lg font-black text-sage-900 dark:text-sage-100 mb-1">ارزیابی با موفقیت انجام شد</h4>
-                                                        <p className="text-sage-700/70 dark:text-sage-400 text-sm max-w-[250px] mx-auto">
-                                                            فصل اول برای شما باز شد. می‌توانید یادگیری را شروع کنید.
+                                                        <h4 className="text-lg font-black text-stone-900 dark:text-stone-100 mb-1">
+                                                            {isFinalExamRow ? "دوره با موفقیت به پایان رسید" : "ارزیابی با موفقیت انجام شد"}
+                                                        </h4>
+                                                        <p className="text-stone-500 text-sm max-w-[250px] mx-auto">
+                                                            {isFinalExamRow ? "شما تمام مراحل را پشت سر گذاشتید." : "فصل اول باز شد. می‌توانید یادگیری را شروع کنید."}
                                                         </p>
                                                     </div>
-                                                    <button
-                                                        onClick={() => setOpenChapterId(chapters[1]?.id || null)}
-                                                        className="text-sage-600 dark:text-sage-400 text-xs font-black hover:underline underline-offset-4"
-                                                    >
-                                                        مشاهده دروس فصل اول
-                                                    </button>
                                                 </>
                                             ) : (
                                                 <>
                                                     <div className="w-16 h-16 bg-white dark:bg-stone-800 rounded-2xl flex items-center justify-center mx-auto shadow-sm">
-                                                        <Sprout size={32} className="text-sage-600 dark:text-sage-400" />
+                                                        {isFinalExamRow ? <Sparkles size={32} className="text-amber-600" /> : <Sprout size={32} className="text-sage-600" />}
                                                     </div>
                                                     <div>
-                                                        <h4 className="text-lg font-black text-sage-900 dark:text-stone-100 mb-2">شروع ارزیابی اولیه</h4>
-                                                        <p className="text-sage-700/70 dark:text-stone-400 text-sm leading-relaxed max-w-sm mx-auto">
-                                                            برای باز کردن فصل اول و شروع مسیر تحول، ابتدا باید این ارزیابی اولیه را انجام دهید.
+                                                        <h4 className="text-lg font-black text-stone-900 dark:text-stone-100 mb-2">
+                                                            {isFinalExamRow ? "شروع آزمون نهایی" : "شروع ارزیابی اولیه"}
+                                                        </h4>
+                                                        <p className="text-stone-500 text-sm leading-relaxed max-w-sm mx-auto">
+                                                            {isFinalExamRow 
+                                                                ? "حالا وقت آن است که تغییرات خود را بعد از گذراندن دوره بسنجید." 
+                                                                : "برای باز کردن فصل اول و شروع مسیر تحول، ابتدا این ارزیابی را انجام دهید."}
                                                         </p>
                                                     </div>
                                                     <Link
-                                                        href="/quiz/pretest"
-                                                        className="inline-flex items-center gap-3 bg-sage-600 text-white px-10 py-4 rounded-2xl font-black hover:bg-sage-700 transition-all shadow-lg shadow-sage-200 dark:shadow-none active:scale-95 mx-auto"
+                                                        href={isFinalExamRow ? "/quiz/posttest" : "/quiz/pretest"}
+                                                        className={`inline-flex items-center gap-3 px-10 py-4 rounded-2xl font-black text-white transition-all active:scale-95 mx-auto ${isFinalExamRow ? 'bg-amber-600 hover:bg-amber-700 shadow-amber-200' : 'bg-sage-600 hover:bg-sage-700 shadow-sage-200'}`}
                                                     >
                                                         شروع آزمون <ChevronLeft size={20} />
                                                     </Link>

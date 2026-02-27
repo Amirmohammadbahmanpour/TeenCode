@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import { User, Calendar, GraduationCap, Banknote, Users, Baby, ArrowLeft, Loader2 } from "lucide-react";
 
 export default function CompleteProfile() {
@@ -48,30 +49,56 @@ export default function CompleteProfile() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // ۱. اعتبارسنجی اولیه (اختیاری ولی توصیه شده)
+        if (!fullName.trim()) {
+            toast.error("لطفاً نام و نام خانوادگی خود را وارد کنید");
+            return;
+        }
+
         setLoading(true);
 
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+        try {
+            // ۲. گرفتن اطلاعات کاربر فعلی
+            const { data: { user } } = await supabase.auth.getUser();
 
-        const { error } = await supabase
-            .from('profiles')
-            .update({
-                full_name: fullName,
-                age: age ? parseInt(age) : null,
-                education_level: education,
-                economic_status: economic,
-                children_count: childrenCount ? parseInt(childrenCount) : 0,
-                teen_age: childAge ? parseInt(childAge) : null,
-                is_onboarded: true
-            })
-            .eq('id', user.id);
+            if (!user) {
+                toast.error("جلسه کاربری شما منقضی شده است. لطفا دوباره وارد شوید");
+                router.push('/login');
+                return;
+            }
 
-        if (error) {
-            alert("خطا در ذخیره: " + error.message);
-        } else {
-            router.push("/dashboard");
+            // ۳. آپدیت پروفایل در سوبابیس
+            const { error } = await supabase
+                .from('profiles')
+                .update({
+                    full_name: fullName,
+                    age: age ? parseInt(age) : null,
+                    education_level: education,
+                    economic_status: economic,
+                    children_count: childrenCount ? parseInt(childrenCount) : 0,
+                    teen_age: childAge ? parseInt(childAge) : null,
+                    is_onboarded: true
+                })
+                .eq('id', user.id);
+
+            if (error) {
+                toast.error("خطا در ذخیره اطلاعات: " + error.message);
+            } else {
+                // نمایش پیام موفقیت قبل از انتقال
+                toast.success("پروفایل شما با موفقیت تکمیل شد! ✨");
+
+                // انتقال به داشبورد بعد از یک مکث کوتاه برای حس بهتر کاربر
+                setTimeout(() => {
+                    router.push("/dashboard");
+                }, 1000);
+            }
+        } catch (err) {
+            toast.error("یک خطای غیرمنتظره رخ داد");
+            console.error(err);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     if (checkingAuth) return (

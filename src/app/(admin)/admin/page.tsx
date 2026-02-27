@@ -8,15 +8,7 @@ interface StatCardProps {
   icon: React.ElementType;
   color: string;
 }
-const { data: { user } } = await supabase.auth.getUser()
 
-  // ۲. شرط ادمین بودن (مثلاً چک کردن ایمیل خاص)
-  const isAdmin = user?.email === "admin@yoursite.com"; 
-
-  // ۳. اگر ادمین نبود، ریدایرکت به صفحه اصلی
-  if (!isAdmin) {
-    redirect('/')
-  }
 function StatCard({ title, value, icon: Icon, color }: StatCardProps) {
   return (
     <div className="bg-white dark:bg-stone-900 p-6 rounded-[2rem] border border-stone-200 dark:border-stone-800 shadow-sm">
@@ -34,6 +26,23 @@ function StatCard({ title, value, icon: Icon, color }: StatCardProps) {
 }
 
 export default async function AdminDashboard() {
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/login')
+  }
+
+  // ۲. چک کردن نقش کاربر (Role)
+  const { data: profile, error } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  // ۳. اگر پروفایل یافت نشد یا نقش کاربر admin نبود
+  if (error || profile?.role !== 'admin') {
+    redirect('/') // ریدایرکت به صفحه اصلی
+  }
   // گرفتن آمار از سوبابیس (به صورت موازی برای سرعت بیشتر)
   const [postsCount, profilesCount] = await Promise.all([
     supabase.from('posts').select('*', { count: 'exact', head: true }),
@@ -49,29 +58,29 @@ export default async function AdminDashboard() {
 
       {/* Grid کارت‌های آماری */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard 
-          title="کل مقالات" 
-          value={postsCount.count || 0} 
-          icon={FileText} 
-          color="bg-sage-600" 
+        <StatCard
+          title="کل مقالات"
+          value={postsCount.count || 0}
+          icon={FileText}
+          color="bg-sage-600"
         />
-        <StatCard 
-          title="تعداد کاربران" 
-          value={profilesCount.count || 0} 
-          icon={Users} 
-          color="bg-blue-600" 
+        <StatCard
+          title="تعداد کاربران"
+          value={profilesCount.count || 0}
+          icon={Users}
+          color="bg-blue-600"
         />
-        <StatCard 
-          title="نظرات جدید" 
-          value="۱۲" 
-          icon={MessageSquare} 
-          color="bg-amber-500" 
+        <StatCard
+          title="نظرات جدید"
+          value="۱۲"
+          icon={MessageSquare}
+          color="bg-amber-500"
         />
-        <StatCard 
-          title="رشد ماهانه" 
-          value="+۱۵٪" 
-          icon={TrendingUp} 
-          color="bg-emerald-500" 
+        <StatCard
+          title="رشد ماهانه"
+          value="+۱۵٪"
+          icon={TrendingUp}
+          color="bg-emerald-500"
         />
       </div>
 

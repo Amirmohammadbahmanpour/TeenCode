@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { Heart } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { useRouter } from 'next/navigation'
 
 interface LikeButtonProps {
   id: string;          // آیدی پست یا کامنت
@@ -14,6 +15,7 @@ export function LikeButton({ id, initialLikes, type, userId: initialUserId }: Li
   const [likes, setLikes] = useState(initialLikes);
   const [hasLiked, setHasLiked] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
+  const router = useRouter()
 
   const table = type === 'post' ? 'post_likes' : 'comment_likes';
   const column = type === 'post' ? 'post_id' : 'comment_id';
@@ -52,7 +54,8 @@ export function LikeButton({ id, initialLikes, type, userId: initialUserId }: Li
     const currentUserId = session?.user?.id;
 
     if (!currentUserId) {
-      alert("برای لایک کردن باید وارد حساب خود شوید.");
+      const currentPath = window.location.pathname;
+      router.push(`/login?returnTo=${currentPath}`);
       return;
     }
 

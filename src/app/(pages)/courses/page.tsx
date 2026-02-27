@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import ChapterList from "./ChapterList";
 import Image from "next/image";
 
-// تعریف اینترفیس‌ها
+// تعریف اینترفیس‌های دقیق
 export interface Lesson {
   id: string;
   title: string;
@@ -13,6 +13,7 @@ export interface Lesson {
 export interface Chapter {
   id: number;
   title: string;
+  slug: string; // اضافه شدن برای شناسایی آزمون نهایی
   lessons: Lesson[];
 }
 
@@ -25,18 +26,19 @@ export default async function CoursesPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) redirect("/login");
 
-    // کوئری‌ها
-    const { data: examData } = await supabase
+    // ۱. کوئری وضعیت آزمون‌ها (ورودی و نهایی)
+    const { data: examsData } = await supabase
         .from("user_exams")
-        .select("id")
-        .eq("user_id", user.id)
-        .eq("exam_type", "pretest");
+        .select("exam_type")
+        .eq("user_id", user.id);
 
+    // ۲. کوئری دسته‌بندی‌ها و دروس
     const { data: chaptersData } = await supabase
         .from("categories")
         .select(`
             id,
             title,
+            slug,
             lessons (
                 id,
                 title,
@@ -45,14 +47,19 @@ export default async function CoursesPage() {
         `)
         .order("order_index", { ascending: true });
 
+    // ۳. کوئری پیشرفت دروس
     const { data: progressData } = await supabase
         .from("user_progress")
         .select("lesson_id")
         .eq("user_id", user.id);
 
+    // پردازش داده‌ها
     const chapters = (chaptersData as unknown as Chapter[]) || [];
     const completedLessonIds = (progressData || []).map(p => p.lesson_id);
-    const entranceExamPassed = Array.isArray(examData) && examData.length > 0;
+    
+    // استخراج وضعیت قبولی آزمون‌ها از آرایه نتایج
+    const entranceExamPassed = examsData?.some(e => e.exam_type === "pretest") || false;
+    const finalExamPassed = examsData?.some(e => e.exam_type === "posttest") || false;
 
     return (
         <div className="min-h-screen bg-stone-50 dark:bg-stone-950 pb-20" dir="rtl">
@@ -60,13 +67,12 @@ export default async function CoursesPage() {
             {/* بخش بنر و هدر */}
             <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
                 <Image 
-                    src="/course-banner.png" // نام فایل بنر خود را اینجا جایگزین کنید
+                    src="/course-banner.png" 
                     alt="Banner"
                     fill
                     className="object-cover"
                     priority
                 />
-                {/* سایه (Gradient) پایین عکس برای محو شدن در پس‌زمینه */}
                 <div className="absolute inset-0 bg-gradient-to-t from-stone-50 via-stone-50/20 to-transparent dark:from-stone-950 dark:via-stone-950/20" />
             </div>
 
@@ -89,7 +95,7 @@ export default async function CoursesPage() {
                     chapters={chapters}
                     completedLessonIds={completedLessonIds}
                     entranceExamPassed={entranceExamPassed}
-                    finalExamPassed={false} 
+                    finalExamPassed={finalExamPassed} 
                 />
             </div>
         </div>

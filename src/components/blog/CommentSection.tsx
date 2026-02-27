@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { User, Reply, X } from 'lucide-react'
 import { CommentForm } from './CommentForm'
 import { LikeButton } from './LikeButton'
+import { useRouter } from 'next/navigation' // اصلاح شد: از navigation استفاده کن
 
 // --- تعاریف تایپ‌ها ---
 interface Profile {
@@ -43,7 +44,7 @@ const RenderComments = ({
   userId: string | null,
   level?: number
 }) => {
-  // فیلتر کردن کامنت‌هایی که پدرشان ID مشخص شده است
+  const router = useRouter(); // تعریف روتر برای ریدایرکت
   const children = allComments.filter(c => c.parent_id === parentId);
 
   if (children.length === 0) return null;
@@ -77,6 +78,11 @@ const RenderComments = ({
                 />
                 <button 
                   onClick={() => {
+                    // چک کردن لاگین بودن قبل از اجازه پاسخ دادن
+                    if (!userId) {
+                        router.push('/login');
+                        return;
+                    }
                     setReplyTo({ id: comment.id, name: comment.profiles?.full_name || "کاربر" });
                     document.getElementById('comment-form-container')?.scrollIntoView({ behavior: 'smooth' });
                   }}
@@ -91,7 +97,6 @@ const RenderComments = ({
             </p>
           </div>
 
-          {/* فراخوانی مجدد برای پیدا کردن ریپلای‌هایِ این ریپلای */}
           <RenderComments 
             allComments={allComments} 
             parentId={comment.id} 
@@ -111,7 +116,6 @@ export function CommentSection({ comments, postId, userId }: CommentSectionProps
 
   return (
     <div className="space-y-12">
-      {/* فرم ثبت نظر با قابلیت تشخیص ریپلای */}
       <div id="comment-form-container" className="scroll-mt-32">
         {replyTo && (
           <div className="mb-4 flex items-center justify-between bg-sage-50 dark:bg-sage-900/20 p-4 rounded-2xl border border-sage-200 dark:border-sage-800 animate-in fade-in slide-in-from-top-2">
@@ -130,7 +134,6 @@ export function CommentSection({ comments, postId, userId }: CommentSectionProps
         <CommentForm postId={postId} parentId={replyTo?.id || null} />
       </div>
 
-      {/* شروع رندر از سطح صفر (بدون parentId) */}
       <div className="mt-16">
         {comments.length > 0 ? (
           <RenderComments 

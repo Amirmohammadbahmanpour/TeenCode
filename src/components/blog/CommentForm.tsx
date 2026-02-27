@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Send, Loader2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 // اضافه کردن parentId به اینترفیس برای رفع ارور TS
 interface CommentFormProps {
@@ -13,6 +14,7 @@ export function CommentForm({ postId, parentId = null }: CommentFormProps) {
     const [comment, setComment] = useState('')
     const [loading, setLoading] = useState(false)
     const [sent, setSent] = useState(false)
+    const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -23,7 +25,8 @@ export function CommentForm({ postId, parentId = null }: CommentFormProps) {
         const { data: { user } } = await supabase.auth.getUser()
 
         if (!user) {
-            alert('برای ثبت نظر باید وارد حساب کاربری خود شوید.')
+            const currentPath = window.location.pathname;
+            router.push(`/login?returnTo=${currentPath}`);
             setLoading(false)
             return
         }

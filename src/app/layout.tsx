@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Navbar } from "@/components/Navbar";
 import Footer from "@/components/contact-us"; 
 import { SmartFooter } from "@/components/SmartFooter";
+import { Toaster } from 'react-hot-toast';
 import "./globals.css";
 
 const vazir = Vazirmatn({ subsets: ["arabic"], display: "swap" });
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 {/* محتوای اصلی که حالا با سرعت موشک لود می‌شود */}
                 <main className="flex-1 overflow-y-auto relative">
                   {children}
+                  <Toaster position="top-center" reverseOrder={false} />
 
                   <SmartFooter />
                 </main>
