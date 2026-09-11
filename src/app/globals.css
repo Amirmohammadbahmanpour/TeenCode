@@ -1,0 +1,74 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('/fonts/Vazir.woff2') format('woff2'),
+       url('/fonts/Vazir.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('/fonts/Vazir-Bold.woff2') format('woff2'),
+       url('/fonts/Vazir-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+body {
+  font-family: 'Vazirmatn', sans-serif;
+}
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-sidebar: var(--sidebar-background);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sage-600: #7a9179;
+  --color-sage-soft: #f0f4f0; /* سبز ملوی لایت */
+  --color-sage-dark: #1a231a; /* سبز ملوی خیلی تیره برای دارک */
+  --color-cream-soft: #fdfaf3; /* کرم ظریف */
+  --color-cream-dark: #1c1b17;
+}
+
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 240 10% 3.9%;
+  --sidebar-background: 0 0% 98%;
+  --sidebar-foreground: 240 5.3% 26.1%;
+  --sidebar-border: 142 20% 92%;
+}
+
+.dark {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --sidebar-background: 240 10% 3.9%; /* تیره سنگی */
+  --sidebar-foreground: 0 0% 98%;
+  --sidebar-border: 240 5% 15%;
+  --border: 240 3.7% 20%;
+}
+@layer base {
+  html {
+    scroll-behavior: smooth !important;
+  }
+}
+
+@layer base {
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    @apply transition-colors duration-300;
+  }
+}
