@@ -4,20 +4,8 @@ import { CheckCircle2, BookOpen, Calendar, Lock } from "lucide-react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
-
-// ========== تایپ‌ها ==========
-interface Lesson {
-    id: string;
-    title: string;
-    order_index: number;
-}
-
-interface UserProgress {
-    lesson_id: string;
-    is_completed: boolean;
-}
 
 interface Profile {
     created_at: string;
@@ -49,24 +37,25 @@ interface PlantStage {
     color: string;
 }
 
-// ========== تابع دریافت داده‌ها ==========
 async function getUserData(token: string) {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
-    
+    const API_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
+
     const userRes = await fetch(`${API_URL}/user`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: "no-store",
     });
-    
+
     if (!userRes.ok) return null;
-    
+
     const data: ApiUserResponse = await userRes.json();
     return data;
 }
 
 async function getLessonsAndProgress(token: string, userId: number) {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
-    
+    const API_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
+
     const [lessonsRes, progressRes] = await Promise.all([
         fetch(`${API_URL}/lessons`, {
             headers: { Authorization: `Bearer ${token}` },
@@ -77,170 +66,346 @@ async function getLessonsAndProgress(token: string, userId: number) {
             cache: "no-store",
         }),
     ]);
-    
-    const allLessons: ApiLessonsResponse[] = lessonsRes.ok ? await lessonsRes.json() : [];
-    const progress: ApiProgressResponse[] = progressRes.ok ? await progressRes.json() : [];
-    
-    // ✅ لاگ برای دیباگ
-    console.log("📊 Total lessons from API:", allLessons.length);
-    console.log("📊 Lessons IDs:", allLessons.map(l => l.id));
-    console.log("📊 Progress count:", progress.length);
-    console.log("📊 Completed IDs:", progress.filter(p => p.is_completed).map(p => p.lesson_id));
-    
-    const sortedLessons = [...allLessons].sort((a, b) => a.order_index - b.order_index);
-    
+
+    const allLessons: ApiLessonsResponse[] = lessonsRes.ok
+        ? await lessonsRes.json()
+        : [];
+
+    const progress: ApiProgressResponse[] = progressRes.ok
+        ? await progressRes.json()
+        : [];
+
+    const sortedLessons = [...allLessons].sort(
+        (a, b) => a.order_index - b.order_index
+    );
+
     return {
         allLessons: sortedLessons,
-        completedIds: progress.filter(p => p.is_completed).map(p => p.lesson_id),
+        completedIds: progress
+            .filter((p) => p.is_completed)
+            .map((p) => p.lesson_id),
     };
 }
 
-// ========== تابع کمکی برای مرحله گیاه ==========
 function getPlantStage(progressPercent: number): PlantStage {
     if (progressPercent < 25) {
-        return { img: "/grow-1.webp", label: "مرحله بذر", color: "text-amber-700" };
+        return {
+            img: "/grow-1.webp",
+            label: "مرحله بذر",
+            color: "text-amber-700 dark:text-amber-400",
+        };
     }
+
     if (progressPercent < 50) {
-        return { img: "/grow-2.webp", label: "مرحله جوانه", color: "text-emerald-600" };
+        return {
+            img: "/grow-2.webp",
+            label: "مرحله جوانه",
+            color: "text-emerald-600 dark:text-emerald-400",
+        };
     }
+
     if (progressPercent < 75) {
-        return { img: "/grow-3.webp", label: "در حال رشد", color: "text-sage-600" };
+        return {
+            img: "/grow-3.webp",
+            label: "در حال رشد",
+            color: "text-sage-600 dark:text-sage-400",
+        };
     }
-    return { img: "/grow-4.webp", label: "درخت دانایی", color: "text-green-800" };
+
+    return {
+        img: "/grow-4.webp",
+        label: "درخت دانایی",
+        color: "text-green-800 dark:text-green-400",
+    };
 }
 
-// ========== صفحه اصلی ==========
 export default async function GrowthPage() {
     const cookieStore = await cookies();
     const token = cookieStore.get("auth_token")?.value;
-    
+
     if (!token) {
         redirect("/login");
     }
-    
-    // دریافت داده‌ها
+
     const userData = await getUserData(token);
-    
+
     if (!userData) {
         redirect("/login");
     }
-    
+
     const userId = userData.user.id;
-    const { allLessons, completedIds } = await getLessonsAndProgress(token, userId);
-    
-    // محاسبات آمار
+
+    const { allLessons, completedIds } =
+        await getLessonsAndProgress(token, userId);
+
     const totalCount = allLessons.length;
     const completedCount = completedIds.length;
-    const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
-    
-    // محاسبه روزهای همراهی (از تاریخ ایجاد پروفایل)
+
+    const progressPercent =
+        totalCount > 0
+            ? Math.round((completedCount / totalCount) * 100)
+            : 0;
+
     let daysActive = 1;
+
     if (userData.profile?.created_at) {
         const startDate = new Date(userData.profile.created_at);
-        daysActive = Math.floor((new Date().getTime() - startDate.getTime()) / (1000 * 3600 * 24)) + 1;
+        const today = new Date();
+
+        const start = new Date(
+            startDate.getFullYear(),
+            startDate.getMonth(),
+            startDate.getDate()
+        );
+
+        const current = new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            today.getDate()
+        );
+
+        daysActive =
+            Math.floor(
+                (current.getTime() - start.getTime()) /
+                    (1000 * 60 * 60 * 24)
+            ) + 1;
     }
-    
-    // پیدا کردن درس بعدی (اولین درسی که کامل نشده)
-    const nextLesson = allLessons.find(lesson => !completedIds.includes(lesson.id));
+
+    const nextLesson = allLessons.find(
+        (lesson) => !completedIds.includes(lesson.id)
+    );
+
+    const completedLessons = allLessons.filter((lesson) =>
+        completedIds.includes(lesson.id)
+    );
+
     const stage = getPlantStage(progressPercent);
-    
-    // درس‌های تکمیل شده
-    const completedLessons = allLessons.filter(lesson => completedIds.includes(lesson.id));
-    
+
     return (
-        <div className="max-w-5xl mx-auto p-6 md:p-12 min-h-screen" dir="rtl">
-            {/* Header */}
-            <div className="mb-12">
-                <h1 className="text-4xl font-[1000] text-stone-900 dark:text-white tracking-tighter">
-                    باغچه <span className="text-sage-600">دانایی</span> من
-                </h1>
-                <p className="text-stone-500 mt-2 font-medium text-lg">مسیر اختصاصی یادگیری شما</p>
-            </div>
+        <main
+            className="min-h-screen w-full max-w-full overflow-x-hidden bg-stone-50 dark:bg-stone-950"
+            dir="rtl"
+        >
+            <div className="w-full max-w-4xl mx-auto px-3 sm:px-5 lg:px-6 py-4 sm:py-6 lg:py-8">
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                {/* Header */}
+                <header className="mb-4 sm:mb-6">
+                    <h1 className="text-[20px] sm:text-2xl lg:text-3xl font-black tracking-tight text-stone-900 dark:text-white">
+                        باغچه <span className="text-sage-600">دانایی</span> من
+                    </h1>
 
-                {/* بخش بصری گیاه */}
-                <div className="lg:col-span-7 bg-white dark:bg-stone-900 rounded-[3.5rem] p-10 border border-stone-100 dark:border-stone-800 shadow-xl flex flex-col items-center relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-sage-50 dark:bg-sage-900/20 rounded-bl-[5rem] -z-0" />
+                    <p className="mt-0.5 text-[10px] sm:text-xs text-stone-400 dark:text-stone-500 font-medium">
+                        مسیر اختصاصی یادگیری شما
+                    </p>
+                </header>
 
-                    <div className="relative w-64 h-64 md:w-80 md:h-80 transition-all duration-700">
-                        <Image 
-                            src={stage.img} 
-                            alt={stage.label} 
-                            fill 
-                            className="object-contain z-10"
-                            priority
-                        />
-                    </div>
+                {/* Growth Card */}
+                <section className="bg-white dark:bg-stone-900 rounded-2xl sm:rounded-3xl border border-stone-100 dark:border-stone-800 shadow-sm">
 
-                    <div className="mt-10 text-center z-10">
-                        <div className={`text-3xl font-black mb-2 ${stage.color}`}>{stage.label}</div>
-                        <div className="w-64 h-3 bg-stone-100 dark:bg-stone-800 rounded-full mx-auto overflow-hidden">
+                    <div className="flex flex-col items-center px-3 py-4 sm:px-6 sm:py-6">
+
+                        {/* Plant */}
+                        <div className="relative w-[125px] h-[125px] sm:w-44 sm:h-44 lg:w-56 lg:h-56">
+                            <Image
+                                src={stage.img}
+                                alt={stage.label}
+                                fill
+                                className="object-contain"
+                                priority
+                            />
+                        </div>
+
+                        {/* Stage */}
+                        <h2
+                            className={`mt-1 text-[17px] sm:text-xl lg:text-2xl font-black ${stage.color}`}
+                        >
+                            {stage.label}
+                        </h2>
+
+                        {/* Progress */}
+                        <div className="w-full max-w-[260px] sm:max-w-xs mt-3">
+
                             <div
-                                className="h-full bg-sage-500 transition-all duration-1000"
-                                style={{ width: `${progressPercent}%` }}
+                                className="h-2 sm:h-2.5 w-full bg-stone-100 dark:bg-stone-800 rounded-full overflow-hidden"
                                 role="progressbar"
                                 aria-valuenow={progressPercent}
                                 aria-valuemin={0}
                                 aria-valuemax={100}
+                                aria-label="درصد پیشرفت"
+                            >
+                                <div
+                                    className="h-full rounded-full bg-sage-500 transition-[width] duration-700 ease-out"
+                                    style={{
+                                        width: `${progressPercent}%`,
+                                    }}
+                                />
+                            </div>
+
+                            <div className="flex items-center justify-between mt-1.5">
+                                <span className="text-[9px] sm:text-[10px] text-stone-400 font-bold">
+                                    {completedCount} از {totalCount} درس
+                                </span>
+
+                                <span className="text-[10px] sm:text-xs text-sage-600 dark:text-sage-400 font-black">
+                                    {progressPercent}٪
+                                </span>
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+
+                {/* Stats */}
+                <div className="grid grid-cols-2 gap-2.5 sm:gap-3 mt-2.5 sm:mt-3">
+
+                    <div className="flex items-center gap-2.5 bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 rounded-xl sm:rounded-2xl px-3 py-2.5 sm:px-4 sm:py-3 shadow-sm">
+
+                        <div className="w-8 h-8 sm:w-9 sm:h-9 shrink-0 rounded-lg sm:rounded-xl bg-sage-50 dark:bg-sage-950/40 flex items-center justify-center">
+                            <Calendar
+                                size={15}
+                                className="text-sage-600 dark:text-sage-400"
                             />
                         </div>
-                        <p className="mt-4 text-stone-500 font-bold text-sm">
-                            تکمیل شده: {progressPercent}% ({completedCount} از {totalCount} درس)
-                        </p>
+
+                        <div className="min-w-0">
+                            <span className="block text-base sm:text-lg font-black text-stone-800 dark:text-white leading-none">
+                                {daysActive}
+                            </span>
+
+                            <span className="block mt-1 text-[8px] sm:text-[10px] text-stone-400 font-bold">
+                                روز همراهی
+                            </span>
+                        </div>
                     </div>
+
+                    <div className="flex items-center gap-2.5 bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 rounded-xl sm:rounded-2xl px-3 py-2.5 sm:px-4 sm:py-3 shadow-sm">
+
+                        <div className="w-8 h-8 sm:w-9 sm:h-9 shrink-0 rounded-lg sm:rounded-xl bg-sage-50 dark:bg-sage-950/40 flex items-center justify-center">
+                            <BookOpen
+                                size={15}
+                                className="text-sage-600 dark:text-sage-400"
+                            />
+                        </div>
+
+                        <div className="min-w-0">
+                            <span className="block text-base sm:text-lg font-black text-stone-800 dark:text-white leading-none">
+                                {completedCount}/{totalCount}
+                            </span>
+
+                            <span className="block mt-1 text-[8px] sm:text-[10px] text-stone-400 font-bold">
+                                درس تکمیل‌شده
+                            </span>
+                        </div>
+                    </div>
+
                 </div>
 
-                {/* بخش آمار و لیست دروس */}
-                <div className="lg:col-span-5 space-y-6">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-white dark:bg-stone-900 p-6 rounded-[2.5rem] border border-stone-100 dark:border-stone-800 shadow-sm text-center">
-                            <Calendar className="mx-auto text-sage-600 mb-3" size={24} />
-                            <span className="block text-2xl font-black text-stone-800 dark:text-white">{daysActive} روز</span>
-                            <span className="text-xs text-stone-400 font-bold">همراهی</span>
-                        </div>
-                        <div className="bg-white dark:bg-stone-900 p-6 rounded-[2.5rem] border border-stone-100 dark:border-stone-800 shadow-sm text-center">
-                            <BookOpen className="mx-auto text-sage-600 mb-3" size={24} />
-                            <span className="block text-2xl font-black text-stone-800 dark:text-white">{completedCount}/{totalCount}</span>
-                            <span className="text-xs text-stone-400 font-bold">دروس پاس شده</span>
-                        </div>
-                    </div>
+                {/* Learning Path */}
+                <section className="mt-2.5 sm:mt-3 bg-stone-900 dark:bg-sage-950 rounded-2xl sm:rounded-3xl text-white overflow-hidden">
 
-                    <div className="bg-stone-900 dark:bg-sage-950 p-8 rounded-[3rem] text-white overflow-hidden">
-                        <h3 className="text-xl font-black mb-6 flex items-center gap-3">
-                            <CheckCircle2 className="text-sage-400" />
-                            مسیر یادگیری شما
-                        </h3>
+                    <div className="px-3.5 py-3.5 sm:px-5 sm:py-5">
 
-                        <div className="space-y-5 max-h-[300px] overflow-y-auto">
-                            {/* درس‌های پاس شده */}
-                            {completedLessons.map((lesson) => (
-                                <div key={lesson.id} className="flex items-center justify-between opacity-100">
-                                    <span className="text-sm font-bold text-sage-100">{lesson.title}</span>
-                                    <div className="w-2.5 h-2.5 rounded-full bg-sage-400 shadow-[0_0_10px_rgba(163,190,140,0.8)]" />
-                                </div>
-                            ))}
+                        {/* Title */}
+                        <div className="flex items-center gap-2 mb-3">
+
+                            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
+                                <CheckCircle2
+                                    size={14}
+                                    className="text-sage-400"
+                                />
+                            </div>
+
+                            <div>
+                                <h3 className="text-xs sm:text-sm font-black">
+                                    مسیر یادگیری شما
+                                </h3>
+
+                                <p className="text-[8px] sm:text-[9px] text-stone-400 mt-0.5">
+                                    {completedCount} درس تکمیل شده
+                                </p>
+                            </div>
+
                         </div>
 
-                        {/* درس بعدی */}
+                        {/* Next Lesson */}
                         {nextLesson ? (
-                            <div className="mt-6 p-4 bg-white/10 rounded-2xl border border-white/20">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex flex-col text-right">
-                                        <span className="text-[10px] text-sage-400 font-black uppercase mb-1">قدم بعدی:</span>
-                                        <span className="text-sm font-bold text-white">{nextLesson.title}</span>
-                                    </div>
-                                    <Lock size={16} className="text-sage-400" />
+                            <div className="flex items-center justify-between gap-3 px-3 py-2.5 sm:px-3.5 sm:py-3 rounded-xl bg-white/10 border border-white/10">
+
+                                <div className="min-w-0">
+                                    <span className="block text-[8px] sm:text-[9px] text-sage-400 font-black mb-0.5">
+                                        قدم بعدی
+                                    </span>
+
+                                    <span className="block text-[10px] sm:text-xs font-bold truncate">
+                                        {nextLesson.title}
+                                    </span>
                                 </div>
+
+                                <div className="w-7 h-7 shrink-0 rounded-lg bg-white/10 flex items-center justify-center">
+                                    <Lock
+                                        size={12}
+                                        className="text-sage-400"
+                                    />
+                                </div>
+
                             </div>
                         ) : (
-                            <div className="mt-6 text-center p-4 bg-sage-500/20 rounded-2xl border border-sage-500/30 text-sage-300 text-sm font-bold">
-                                🎉 تبریک! همه دروس را با موفقیت گذرانده‌اید.
+                            <div className="px-3 py-2.5 rounded-xl bg-sage-500/20 border border-sage-500/20 text-center">
+                                <span className="text-[10px] sm:text-xs font-bold text-sage-300">
+                                    🎉 همه درس‌ها را گذرانده‌ای!
+                                </span>
                             </div>
                         )}
+
+                        {/* Completed Lessons */}
+                        {completedLessons.length > 0 && (
+                            <div className="mt-3 pt-3 border-t border-white/10">
+
+                                <div className="flex items-center justify-between mb-1.5">
+                                    <span className="text-[9px] sm:text-[10px] text-stone-400 font-bold">
+                                        درس‌های تکمیل‌شده
+                                    </span>
+
+                                    <span className="text-[8px] text-sage-400 font-bold">
+                                        {completedLessons.length} درس
+                                    </span>
+                                </div>
+
+                                <div className="max-h-32 sm:max-h-40 overflow-y-auto scrollbar-hide">
+
+                                    {completedLessons.map((lesson) => (
+                                        <div
+                                            key={lesson.id}
+                                            className="flex items-center gap-2 py-1.5"
+                                        >
+                                            <span className="w-1.5 h-1.5 shrink-0 rounded-full bg-sage-400" />
+
+                                            <span className="text-[9px] sm:text-[10px] text-sage-100 font-medium truncate">
+                                                {lesson.title}
+                                            </span>
+                                        </div>
+                                    ))}
+
+                                </div>
+                            </div>
+                        )}
+
                     </div>
-                </div>
+                </section>
+
             </div>
-        </div>
+
+            <style>{`
+                .scrollbar-hide {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                }
+
+                .scrollbar-hide::-webkit-scrollbar {
+                    display: none;
+                }
+            `}</style>
+        </main>
     );
 }
+

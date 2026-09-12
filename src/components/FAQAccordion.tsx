@@ -1,59 +1,59 @@
-"use client"
-import { useState } from "react"
-import { Plus, X } from "lucide-react"
+"use client";
 
-// تعریف اینترفیس دقیق برای پراپ‌ها (حذف any)
-interface FaqItemProps {
-  question: string;
-  answer: string;
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
+
+interface FAQItem {
+    question: string;
+    answer: string;
 }
 
-const FaqItem = ({ question, answer }: FaqItemProps) => {
-  const [isOpen, setisOpen] = useState(false);
-
-  return (
-    <div className="dark:border-stone-800 last:border-0 py-2">
-      <button
-        onClick={() => setisOpen(!isOpen)}
-        className={`p-6 w-full flex items-start justify-between text-right transition-all duration-300 group
-          ${isOpen
-            ? 'bg-stone-50 dark:bg-stone-800/50 rounded-t-[1.5rem]'
-            : 'bg-white dark:bg-stone-900 rounded-[1.5rem]'
-          }`}
-      >
-        <span className={`text-base md:text-lg font-bold transition-colors flex-1 ml-4 
-          ${isOpen ? 'text-sage-600' : 'text-stone-700 dark:text-stone-200 group-hover:text-sage-500'}`}>
-          {question}
-        </span>
-
-        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-500 
-          ${isOpen
-            ? 'bg-sage-600 text-white rotate-180'
-            : 'bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400'}`}>
-          {isOpen ? <X size={16} /> : <Plus size={16} />}
-        </div>
-      </button>
-
-      <div className={`grid transition-all duration-500 ease-in-out ${isOpen
-          ? 'grid-rows-[1fr] opacity-100 pb-6 px-6 bg-stone-50 dark:bg-stone-800/50 rounded-b-[1.5rem]'
-          : 'grid-rows-[0fr] opacity-0'
-        }`}>
-        <div className="overflow-hidden">
-          <p className="text-stone-500 dark:text-stone-400 leading-relaxed text-sm md:text-base pr-4 border-r-2 border-sage-200 dark:border-sage-800">
-            {answer}
-          </p>
-        </div>
-      </div>
-    </div>
-  )
+interface FaqAccordionProps {
+    items: FAQItem[];
 }
 
-export default function FaqAccordion({ items }: { items: FaqItemProps[] }) {
-  return (
-    <div className="rounded-[2.5rem] p-8 md:p-12">
-      {items.map((item, index) => (
-        <FaqItem key={index} question={item.question} answer={item.answer} />
-      ))}
-    </div>
-  );
+export default function FaqAccordion({ items }: FaqAccordionProps) {
+    const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+    const toggleItem = (index: number) => {
+        setOpenIndex((current) => (current === index ? null : index));
+    };
+
+    return (
+        <div className="w-full space-y-1 sm:space-y-1.5">
+            {items.map((item, index) => {
+                const isOpen = openIndex === index;
+
+                return (
+                    <div key={index} className={`w-full overflow-hidden rounded-lg sm:rounded-xl border transition-all duration-300 ${isOpen ? "border-sage-200 bg-sage-50/50 dark:border-sage-900 dark:bg-sage-950/20" : "border-stone-100 bg-white dark:border-stone-800 dark:bg-stone-900"}`}>
+
+                        <button type="button" onClick={() => toggleItem(index)} aria-expanded={isOpen} className="flex w-full items-center justify-between gap-2 sm:gap-3 px-2.5 py-2.5 sm:px-4 sm:py-3.5 text-right">
+
+                            <span className={`min-w-0 flex-1 text-[11px] sm:text-sm lg:text-base font-bold leading-5 sm:leading-6 transition-colors duration-200 ${isOpen ? "text-sage-700 dark:text-sage-400" : "text-stone-700 dark:text-stone-200"}`}>
+                                {item.question}
+                            </span>
+
+                            <span className={`flex h-5 w-5 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-full transition-all duration-300 ${isOpen ? "rotate-180 bg-sage-100 text-sage-600 dark:bg-sage-900/50 dark:text-sage-400" : "bg-stone-100 text-stone-500 dark:bg-stone-800 dark:text-stone-400"}`}>
+                                <ChevronDown size={12} strokeWidth={2.5} className="sm:w-3.5 sm:h-3.5" />
+                            </span>
+
+                        </button>
+
+                        <div className={`grid transition-[grid-template-rows] duration-300 ease-out ${isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
+                            <div className="min-h-0 overflow-hidden">
+                                <div className="px-2.5 pb-2.5 sm:px-4 sm:pb-4">
+                                    <div className="border-t border-stone-200/70 dark:border-stone-800 pt-2 sm:pt-3">
+                                        <p className="text-[10px] sm:text-xs lg:text-sm text-stone-500 dark:text-stone-400 leading-5 sm:leading-6 font-medium">
+                                            {item.answer}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                );
+            })}
+        </div>
+    );
 }
