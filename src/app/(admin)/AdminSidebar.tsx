@@ -9,6 +9,7 @@ import {
     LogOut,
     X,
     Menu,
+    BookOpen,
     LucideIcon,
 } from "lucide-react";
 import { useState } from "react";
@@ -132,6 +133,13 @@ export default function AdminSidebar() {
                         href="/x7k9m2p4/comments"
                         icon={Settings}
                         label="کامنت ها"
+                        onClick={closeSidebar}
+                    />
+
+                    <AdminNavLink
+                        href="/x7k9m2p4/lessons"
+                        icon={BookOpen}
+                        label="مدیریت درس‌ها"
                         onClick={closeSidebar}
                     />
                 </nav>
