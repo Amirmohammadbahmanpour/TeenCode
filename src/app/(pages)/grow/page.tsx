@@ -1,8 +1,7 @@
-import React from "react";
 import Image from "next/image";
-import { CheckCircle2, BookOpen, Calendar, Lock } from "lucide-react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { CheckCircle2, BookOpen, Calendar, Lock } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -42,27 +41,37 @@ async function getUserData(token: string) {
         process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
 
     const userRes = await fetch(`${API_URL}/user`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
         cache: "no-store",
     });
 
-    if (!userRes.ok) return null;
+    if (!userRes.ok) {
+        return null;
+    }
 
     const data: ApiUserResponse = await userRes.json();
+
     return data;
 }
 
-async function getLessonsAndProgress(token: string, userId: number) {
+async function getLessonsAndProgress(token: string) {
     const API_URL =
         process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
 
     const [lessonsRes, progressRes] = await Promise.all([
         fetch(`${API_URL}/lessons`, {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
             cache: "no-store",
         }),
+
         fetch(`${API_URL}/my-progress`, {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
             cache: "no-store",
         }),
     ]);
@@ -119,6 +128,34 @@ function getPlantStage(progressPercent: number): PlantStage {
     };
 }
 
+function calculateDaysActive(createdAt?: string): number {
+    if (!createdAt) {
+        return 1;
+    }
+
+    const startDate = new Date(createdAt);
+    const today = new Date();
+
+    const start = new Date(
+        startDate.getFullYear(),
+        startDate.getMonth(),
+        startDate.getDate()
+    );
+
+    const current = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate()
+    );
+
+    const diffDays = Math.floor(
+        (current.getTime() - start.getTime()) /
+            (1000 * 60 * 60 * 24)
+    );
+
+    return Math.max(diffDays + 1, 1);
+}
+
 export default async function GrowthPage() {
     const cookieStore = await cookies();
     const token = cookieStore.get("auth_token")?.value;
@@ -133,10 +170,8 @@ export default async function GrowthPage() {
         redirect("/login");
     }
 
-    const userId = userData.user.id;
-
     const { allLessons, completedIds } =
-        await getLessonsAndProgress(token, userId);
+        await getLessonsAndProgress(token);
 
     const totalCount = allLessons.length;
     const completedCount = completedIds.length;
@@ -146,37 +181,18 @@ export default async function GrowthPage() {
             ? Math.round((completedCount / totalCount) * 100)
             : 0;
 
-    let daysActive = 1;
+    const daysActive = calculateDaysActive(
+        userData.profile?.created_at
+    );
 
-    if (userData.profile?.created_at) {
-        const startDate = new Date(userData.profile.created_at);
-        const today = new Date();
-
-        const start = new Date(
-            startDate.getFullYear(),
-            startDate.getMonth(),
-            startDate.getDate()
-        );
-
-        const current = new Date(
-            today.getFullYear(),
-            today.getMonth(),
-            today.getDate()
-        );
-
-        daysActive =
-            Math.floor(
-                (current.getTime() - start.getTime()) /
-                    (1000 * 60 * 60 * 24)
-            ) + 1;
-    }
+    const completedIdSet = new Set(completedIds);
 
     const nextLesson = allLessons.find(
-        (lesson) => !completedIds.includes(lesson.id)
+        (lesson) => !completedIdSet.has(lesson.id)
     );
 
     const completedLessons = allLessons.filter((lesson) =>
-        completedIds.includes(lesson.id)
+        completedIdSet.has(lesson.id)
     );
 
     const stage = getPlantStage(progressPercent);
@@ -408,4 +424,3 @@ export default async function GrowthPage() {
         </main>
     );
 }
-

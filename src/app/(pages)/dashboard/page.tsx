@@ -1,7 +1,6 @@
-
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -58,171 +57,265 @@ interface ApiResponse {
     };
 }
 
+// ========== محاسبه پیشرفت ==========
+
+function calculateProgress(
+    preTestScore: number | null,
+    postTestScore: number | null
+): { percent: number; finished: boolean } {
+    if (postTestScore !== null && postTestScore >= 60) {
+        return {
+            percent: 100,
+            finished: true,
+        };
+    }
+
+    if (preTestScore !== null) {
+        const percent = Math.min(
+            15 + (preTestScore / 100) * 25,
+            85
+        );
+
+        return {
+            percent: Math.round(percent),
+            finished: false,
+        };
+    }
+
+    return {
+        percent: 0,
+        finished: false,
+    };
+}
+
+// ========== محاسبه روزهای همراهی ==========
+
+function calculateDaysActive(
+    createdAt: string | undefined
+): number {
+    if (!createdAt) return 1;
+
+    const start = new Date(createdAt);
+    const today = new Date();
+
+    const startDay = new Date(
+        start.getFullYear(),
+        start.getMonth(),
+        start.getDate()
+    );
+
+    const todayDay = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate()
+    );
+
+    const diffTime =
+        todayDay.getTime() - startDay.getTime();
+
+    const diffDays = Math.floor(
+        diffTime / (1000 * 60 * 60 * 24)
+    );
+
+    return Math.max(diffDays + 1, 1);
+}
+
 // ========== کامپوننت اصلی ==========
 
 export default function Dashboard() {
-    const [profile, setProfile] = useState<UserProfile | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [progressPercent, setProgressPercent] = useState<number>(0);
-    const [isCourseFinished, setIsCourseFinished] = useState<boolean>(false);
-    const [totalLessons, setTotalLessons] = useState<number>(0);
-    const [completedLessons, setCompletedLessons] = useState<number>(0);
-    const [daysActive, setDaysActive] = useState<number>(1);
+    const [profile, setProfile] =
+        useState<UserProfile | null>(null);
 
-    // ========== محاسبه پیشرفت ==========
+    const [loading, setLoading] =
+        useState<boolean>(true);
 
-    const calculateProgress = useCallback(
-        (
-            preTestScore: number | null,
-            postTestScore: number | null
-        ): { percent: number; finished: boolean } => {
-            if (postTestScore !== null && postTestScore >= 60) {
-                return { percent: 100, finished: true };
-            }
+    const [progressPercent, setProgressPercent] =
+        useState<number>(0);
 
-            if (preTestScore !== null) {
-                const percent = Math.min(
-                    15 + (preTestScore / 100) * 25,
-                    85
-                );
+    const [isCourseFinished, setIsCourseFinished] =
+        useState<boolean>(false);
 
-                return {
-                    percent: Math.round(percent),
-                    finished: false,
-                };
-            }
+    const [totalLessons, setTotalLessons] =
+        useState<number>(0);
 
-            return {
-                percent: 0,
-                finished: false,
-            };
-        },
-        []
-    );
+    const [completedLessons, setCompletedLessons] =
+        useState<number>(0);
 
-    // ========== محاسبه روزهای همراهی ==========
-
-    const calculateDaysActive = (
-        createdAt: string | undefined
-    ): number => {
-        if (!createdAt) return 1;
-
-        const startDate = new Date(createdAt);
-        const today = new Date();
-
-        const diffTime = Math.abs(
-            today.getTime() - startDate.getTime()
-        );
-
-        const diffDays = Math.ceil(
-            diffTime / (1000 * 60 * 60 * 24)
-        );
-
-        return diffDays;
-    };
+    const [daysActive, setDaysActive] =
+        useState<number>(1);
 
     // ========== دریافت اطلاعات ==========
 
     useEffect(() => {
+        let mounted = true;
+
         async function fetchData() {
             const token = auth.getToken();
 
             if (!token) {
-                setLoading(false);
+                if (mounted) {
+                    setLoading(false);
+                }
                 return;
             }
 
             try {
-                // ۱. اطلاعات کاربر و پروفایل
-                const response = await api.get<ApiResponse>("/user");
-                const userData = response.data;
+                // ========================================
+                // ۱. اطلاعات کاربر
+                // ========================================
+
+                const userRes =
+                    await api.get<ApiResponse>("/user");
+
+                if (!mounted) return;
+
+                const userData = userRes.data;
 
                 const createdAt =
                     userData.profile?.created_at ||
                     userData.user?.created_at;
 
-                setDaysActive(calculateDaysActive(createdAt));
+                const days = calculateDaysActive(
+                    createdAt
+                );
 
-                // ۲. آزمون‌ها
+                // ========================================
+                // ۲. درخواست‌های مستقل به صورت همزمان
+                // ========================================
+
+                const [
+                    examsResult,
+                    progressResult,
+                    lessonsResult,
+                ] = await Promise.allSettled([
+                    api.get("/user-exams"),
+                    api.get("/my-progress"),
+                    api.get("/lessons"),
+                ]);
+
+                if (!mounted) return;
+
+                // ========================================
+                // ۳. آزمون‌ها
+                // ========================================
+
                 let preTestScore: number | null = null;
                 let postTestScore: number | null = null;
 
-                try {
-                    const examsRes = await api.get("/user-exams");
-                    const exams = examsRes.data as ExamData[];
+                if (
+                    examsResult.status ===
+                    "fulfilled"
+                ) {
+                    const exams =
+                        examsResult.value.data as ExamData[];
 
                     const preTest = exams.find(
-                        (e) => e.exam_type === "pretest"
+                        (exam) =>
+                            exam.exam_type === "pretest"
                     );
 
                     const postTest = exams.find(
-                        (e) => e.exam_type === "posttest"
+                        (exam) =>
+                            exam.exam_type === "posttest"
                     );
 
-                    preTestScore = preTest?.score ?? null;
-                    postTestScore = postTest?.score ?? null;
-                } catch (error) {
-                    console.log(
-                        "No exams data found, using default progress"
-                    );
+                    preTestScore =
+                        preTest?.score ?? null;
+
+                    postTestScore =
+                        postTest?.score ?? null;
                 }
 
-                // ۳. پیشرفت دروس
-                let completed = 0;
-                let total = 0;
+                // ========================================
+                // ۴. پیشرفت دروس
+                // ========================================
 
-                try {
-                    const progressRes = await api.get("/my-progress");
+                let completed = 0;
+
+                if (
+                    progressResult.status ===
+                    "fulfilled"
+                ) {
                     const progress =
-                        progressRes.data as ProgressData[];
+                        progressResult.value
+                            .data as ProgressData[];
 
                     completed = progress.filter(
-                        (p) => p.is_completed === true
+                        (item) =>
+                            item.is_completed === true
                     ).length;
+                }
 
-                    setCompletedLessons(completed);
+                // ========================================
+                // ۵. تعداد کل دروس
+                // ========================================
 
-                    const lessonsRes =
-                        await api.get("/lessons");
+                let total = 0;
 
+                if (
+                    lessonsResult.status ===
+                    "fulfilled"
+                ) {
                     const lessons =
-                        lessonsRes.data as LessonData[];
+                        lessonsResult.value
+                            .data as LessonData[];
 
                     total = lessons.length;
+                }
 
-                    setTotalLessons(total);
+                // ========================================
+                // ۶. محاسبه وضعیت نهایی
+                // ========================================
 
-                    if (completed === total && total > 0) {
-                        setProgressPercent(100);
-                        setIsCourseFinished(true);
-                    } else {
-                        const { percent, finished } =
-                            calculateProgress(
-                                preTestScore,
-                                postTestScore
-                            );
+                let percent = 0;
+                let finished = false;
 
-                        setProgressPercent(percent);
-                        setIsCourseFinished(finished);
-                    }
-                } catch (error) {
-                    const { percent, finished } =
+                if (
+                    total > 0 &&
+                    completed >= total
+                ) {
+                    percent = 100;
+                    finished = true;
+                } else {
+                    const result =
                         calculateProgress(
                             preTestScore,
                             postTestScore
                         );
 
-                    setProgressPercent(percent);
-                    setIsCourseFinished(finished);
+                    percent = result.percent;
+                    finished = result.finished;
                 }
 
-                // پروفایل
+                // ========================================
+                // ۷. به‌روزرسانی Stateها
+                // ========================================
+
+                setDaysActive(days);
+
+                setCompletedLessons(
+                    completed
+                );
+
+                setTotalLessons(total);
+
+                setProgressPercent(percent);
+
+                setIsCourseFinished(
+                    finished
+                );
+
                 setProfile({
                     name:
-                        userData.profile?.full_name ||
+                        userData.profile
+                            ?.full_name ||
                         userData.user?.name ||
                         null,
-                    age: userData.profile?.age || null,
+
+                    age:
+                        userData.profile?.age ??
+                        null,
+
                     avatar: "/Profile.png",
                 });
             } catch (error) {
@@ -231,14 +324,28 @@ export default function Dashboard() {
                     error
                 );
 
+                if (!mounted) return;
+
                 setProgressPercent(15);
+
+                setProfile({
+                    name: null,
+                    age: null,
+                    avatar: "/Profile.png",
+                });
             } finally {
-                setLoading(false);
+                if (mounted) {
+                    setLoading(false);
+                }
             }
         }
 
         fetchData();
-    }, [calculateProgress]);
+
+        return () => {
+            mounted = false;
+        };
+    }, []);
 
     // ========== لودینگ ==========
 
@@ -253,6 +360,8 @@ export default function Dashboard() {
     const isProfileIncomplete =
         !profile?.name || !profile?.age;
 
+    // ========== UI ==========
+
     return (
         <div
             className="min-h-screen w-full max-w-full overflow-x-hidden bg-stone-50 dark:bg-stone-950 transition-colors duration-300"
@@ -264,7 +373,7 @@ export default function Dashboard() {
 
                 <header className="mb-5 sm:mb-7 lg:mb-8">
                     <h1 className="text-[22px] sm:text-3xl md:text-4xl font-black text-stone-800 dark:text-white leading-tight">
-                        سلام،{" "}
+                        سلام{" "}
                         <span className="text-sage-600 dark:text-sage-500">
                             {profile?.name?.split(" ")[0] ||
                                 "دوست عزیز"}{" "}
@@ -293,6 +402,7 @@ export default function Dashboard() {
 
                             <div className="relative shrink-0">
                                 <div className="w-[68px] h-[68px] sm:w-24 sm:h-24 lg:w-28 lg:h-28 relative">
+
                                     <Image
                                         src={
                                             profile?.avatar ||
@@ -328,6 +438,7 @@ export default function Dashboard() {
                             {/* اطلاعات */}
 
                             <div className="flex-1 min-w-0 text-center sm:text-right">
+
                                 <h2 className="text-[16px] sm:text-xl lg:text-2xl font-bold text-stone-800 dark:text-white truncate">
                                     {profile?.name ||
                                         "کاربر جدید"}
@@ -336,9 +447,11 @@ export default function Dashboard() {
                                 {profile?.age && (
                                     <p className="text-[10px] sm:text-sm text-stone-500 dark:text-stone-400 mt-0.5 sm:mt-1">
                                         {profile.age} سال
+
                                         <span className="mx-1.5 text-stone-300 dark:text-stone-700">
                                             •
                                         </span>
+
                                         {totalLessons} درس
                                     </p>
                                 )}
@@ -360,6 +473,7 @@ export default function Dashboard() {
 
                             {!isCourseFinished && (
                                 <div className="w-full sm:w-auto shrink-0 text-center bg-sage-50 dark:bg-sage-900/20 rounded-xl sm:rounded-2xl px-4 sm:px-6 py-2 sm:py-3">
+
                                     <p className="text-[9px] sm:text-xs text-stone-500 dark:text-stone-400">
                                         نمره ارزیابی اولیه
                                     </p>
@@ -367,8 +481,10 @@ export default function Dashboard() {
                                     <p className="text-xl sm:text-2xl font-black text-sage-600 dark:text-sage-500">
                                         {progressPercent}%
                                     </p>
+
                                 </div>
                             )}
+
                         </div>
 
                         {/* نوار پیشرفت */}
@@ -376,6 +492,7 @@ export default function Dashboard() {
                         <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-stone-100 dark:border-stone-800">
 
                             <div className="flex justify-between items-center mb-1.5 sm:mb-2">
+
                                 <span className="text-[10px] sm:text-sm font-medium text-stone-600 dark:text-stone-400">
                                     پیشرفت در دوره
                                 </span>
@@ -383,9 +500,11 @@ export default function Dashboard() {
                                 <span className="text-[10px] sm:text-sm font-bold text-sage-600 dark:text-sage-500">
                                     {progressPercent}%
                                 </span>
+
                             </div>
 
                             <div className="w-full h-2 sm:h-3 bg-stone-100 dark:bg-stone-800 rounded-full overflow-hidden">
+
                                 <div
                                     className={`h-full rounded-full transition-[width] duration-700 ${
                                         isCourseFinished
@@ -396,6 +515,7 @@ export default function Dashboard() {
                                         width: `${progressPercent}%`,
                                     }}
                                 />
+
                             </div>
 
                             {!isCourseFinished &&
@@ -405,8 +525,11 @@ export default function Dashboard() {
                                         {totalLessons} درس تکمیل شده
                                     </p>
                                 )}
+
                         </div>
+
                     </div>
+
                 </section>
 
                 {/* ================= کارت‌های اقدام ================= */}
@@ -420,10 +543,12 @@ export default function Dashboard() {
                         className="group bg-white dark:bg-stone-900 rounded-xl sm:rounded-2xl p-3.5 sm:p-5 lg:p-6 border border-stone-100 dark:border-stone-800 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-[box-shadow,transform] duration-300"
                     >
                         <div className="w-9 h-9 sm:w-11 sm:h-11 lg:w-12 lg:h-12 bg-sage-100 dark:bg-sage-900/30 rounded-lg sm:rounded-xl flex items-center justify-center mb-2.5 sm:mb-4 group-hover:bg-sage-600 transition-colors">
+
                             <BookOpen
                                 className="text-sage-600 group-hover:text-white transition-colors"
                                 size={18}
                             />
+
                         </div>
 
                         <h3 className="text-[13px] sm:text-base lg:text-lg font-bold text-stone-800 dark:text-white mb-0.5 sm:mb-1">
@@ -444,10 +569,12 @@ export default function Dashboard() {
                         className="group bg-white dark:bg-stone-900 rounded-xl sm:rounded-2xl p-3.5 sm:p-5 lg:p-6 border border-stone-100 dark:border-stone-800 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-[box-shadow,transform] duration-300"
                     >
                         <div className="w-9 h-9 sm:w-11 sm:h-11 lg:w-12 lg:h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg sm:rounded-xl flex items-center justify-center mb-2.5 sm:mb-4 group-hover:bg-emerald-600 transition-colors">
+
                             <TrendingUp
                                 className="text-emerald-600 group-hover:text-white transition-colors"
                                 size={18}
                             />
+
                         </div>
 
                         <h3 className="text-[13px] sm:text-base lg:text-lg font-bold text-stone-800 dark:text-white mb-0.5 sm:mb-1">
@@ -462,11 +589,14 @@ export default function Dashboard() {
                     {/* روزهای همراهی */}
 
                     <div className="bg-white dark:bg-stone-900 rounded-xl sm:rounded-2xl p-3.5 sm:p-5 lg:p-6 border border-stone-100 dark:border-stone-800">
+
                         <div className="w-9 h-9 sm:w-11 sm:h-11 lg:w-12 lg:h-12 bg-amber-100 dark:bg-amber-900/30 rounded-lg sm:rounded-xl flex items-center justify-center mb-2.5 sm:mb-4">
+
                             <Calendar
                                 className="text-amber-600"
                                 size={18}
                             />
+
                         </div>
 
                         <h3 className="text-[13px] sm:text-base lg:text-lg font-bold text-stone-800 dark:text-white mb-0.5 sm:mb-1">
@@ -480,7 +610,9 @@ export default function Dashboard() {
                         <p className="text-[9px] sm:text-xs text-stone-400 mt-0.5">
                             از شروع مسیر یادگیری
                         </p>
+
                     </div>
+
                 </div>
 
                 {/* ================= تکمیل پروفایل ================= */}
@@ -488,17 +620,22 @@ export default function Dashboard() {
                 {isProfileIncomplete &&
                     !isCourseFinished && (
                         <section className="bg-gradient-to-r from-sage-50 to-amber-50 dark:from-sage-900/20 dark:to-amber-900/10 rounded-xl sm:rounded-2xl p-3.5 sm:p-5 lg:p-6 border border-sage-200 dark:border-sage-800 mb-4 sm:mb-6">
+
                             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
 
                                 <div className="flex items-center gap-2.5 sm:gap-4 min-w-0">
+
                                     <div className="w-9 h-9 sm:w-12 sm:h-12 shrink-0 bg-sage-100 dark:bg-sage-900/30 rounded-lg sm:rounded-xl flex items-center justify-center">
+
                                         <Sparkles
                                             className="text-sage-600"
                                             size={18}
                                         />
+
                                     </div>
 
                                     <div className="min-w-0 text-right">
+
                                         <h3 className="text-[12px] sm:text-base font-bold text-stone-800 dark:text-stone-200">
                                             تکمیل اطلاعات پروفایل
                                         </h3>
@@ -506,7 +643,9 @@ export default function Dashboard() {
                                         <p className="text-[9px] sm:text-sm text-stone-500 dark:text-stone-400 mt-0.5 leading-5">
                                             با تکمیل اطلاعات، مسیر یادگیری شخصی‌سازی می‌شود
                                         </p>
+
                                     </div>
+
                                 </div>
 
                                 <Link
@@ -514,11 +653,15 @@ export default function Dashboard() {
                                     className="w-full sm:w-auto shrink-0 px-4 sm:px-5 py-2 sm:py-2.5 bg-sage-600 text-white rounded-lg sm:rounded-xl text-[10px] sm:text-sm font-bold hover:bg-sage-700 transition-colors flex items-center justify-center gap-1.5"
                                 >
                                     تکمیل اطلاعات
+
                                     <ChevronLeft
                                         size={15}
                                     />
+
                                 </Link>
+
                             </div>
+
                         </section>
                     )}
 
@@ -526,6 +669,7 @@ export default function Dashboard() {
 
                 {isCourseFinished && (
                     <section className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl sm:rounded-2xl p-5 sm:p-6 lg:p-8 text-white text-center">
+
                         <Trophy
                             className="mx-auto mb-2 sm:mb-3"
                             size={30}
@@ -540,11 +684,16 @@ export default function Dashboard() {
                         </p>
 
                         <button className="bg-white text-amber-600 px-5 sm:px-8 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-[11px] sm:text-sm font-bold hover:bg-stone-100 transition-colors inline-flex items-center gap-1.5">
+
                             <Award size={16} />
+
                             دریافت مدرک افتخار
+
                         </button>
+
                     </section>
                 )}
+
             </div>
         </div>
     );
