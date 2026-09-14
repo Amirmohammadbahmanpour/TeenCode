@@ -17,3 +17,4 @@ export const posttestQuestions: Question[] = [
   { id: 201, text: "متغیرها در جاوااسکریپت با چه کلماتی تعریف می‌شوند؟", options: ["var", "let", "const", "همه موارد"], correctAnswer: 3 },
   { id: 202, text: "خروجی دستور console.log چیست؟", options: ["نمایش در صفحه", "چاپ کاغذی", "نمایش در کنسول مرورگر", "ذخیره در دیتابیس"], correctAnswer: 2 },
 ];
+

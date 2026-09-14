@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import QuizClient from "../pretest/QuizClient";
-import { posttestQuestions } from "@/constans/quizData";
+import { posttestQuestions } from "@/data/question";
 
 export const dynamic = "force-dynamic";
 
