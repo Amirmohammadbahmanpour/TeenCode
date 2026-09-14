@@ -11,7 +11,7 @@ import "./globals.css";
 const vazir = Vazirmatn({ subsets: ["arabic"], display: "swap" });
 
 export const metadata = {
-  title: "تین کد | مسیر تحول",
+  title: " نوجوانه | آموزش نوجوانان ",
   description: "آموزش و رشد برای نسل جدید",
 };
 
@@ -30,7 +30,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 {/* نوبار به عنوان یک جزء کلاینتی جداگانه */}
                 <Navbar />
 
-                {/* محتوای اصلی که حالا با سرعت موشک لود می‌شود */}
                 <main className="flex-1 overflow-y-auto relative">
                   {children}
                   <Toaster position="top-center" reverseOrder={false} />

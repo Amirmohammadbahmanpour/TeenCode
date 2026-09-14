@@ -96,7 +96,12 @@ const VideoPlayer = ({ url, type }: { url: string; type: string }) => {
 
     return (
         <div className="aspect-video rounded-xl sm:rounded-2xl overflow-hidden shadow-lg bg-black">
-            <video controls className="w-full h-full">
+            <video
+                controls
+                controlsList="nodownload"
+                disablePictureInPicture
+                className="w-full h-full"
+            >
                 <source src={url} type="video/mp4" />
                 مرورگر شما از پخش ویدیو پشتیبانی نمی‌کند.
             </video>
@@ -284,10 +289,7 @@ export default function LessonPage() {
                         className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-sm text-stone-500 hover:text-sage-600 transition-colors shrink-0"
                     >
                         <ChevronRight size={17} />
-
-                        <span>
-                            بازگشت به دوره
-                        </span>
+                        <span>بازگشت به دوره</span>
                     </Link>
 
                     <span className="text-[10px] sm:text-sm text-stone-400 truncate max-w-[48%]">
@@ -325,15 +327,7 @@ export default function LessonPage() {
                     </div>
                 )}
 
-                {lesson.video_url && (
-                    <div className="mb-5 sm:mb-10">
-                        <VideoPlayer
-                            url={lesson.video_url}
-                            type={lesson.video_type || "local"}
-                        />
-                    </div>
-                )}
-
+                {/* تصویر درس */}
                 {lesson.featured_image_url && (
                     <div className="mb-5 sm:mb-10">
                         <div className="relative w-full aspect-video rounded-xl sm:rounded-2xl overflow-hidden shadow-lg">
@@ -348,6 +342,17 @@ export default function LessonPage() {
                     </div>
                 )}
 
+                {/* ویدیوی درس */}
+                {lesson.video_url && (
+                    <div className="mb-5 sm:mb-10">
+                        <VideoPlayer
+                            url={lesson.video_url}
+                            type={lesson.video_type || "local"}
+                        />
+                    </div>
+                )}
+
+                {/* پادکست درس */}
                 {lesson.podcast_url && (
                     <div className="mb-5 sm:mb-10 p-3 sm:p-6 bg-stone-50 dark:bg-stone-900/50 rounded-xl sm:rounded-2xl">
                         <div className="flex items-center gap-2 sm:gap-3 mb-2.5 sm:mb-4 text-sage-600">
@@ -360,12 +365,14 @@ export default function LessonPage() {
 
                         <audio
                             controls
+                            controlsList="nodownload"
                             className="w-full h-9 sm:h-auto"
                             src={lesson.podcast_url}
                         />
                     </div>
                 )}
 
+                {/* محتوای متنی درس */}
                 {lesson.content_text && (
                     <section className="prose prose-stone dark:prose-invert max-w-none mb-6 sm:mb-10 text-[13px] sm:text-base leading-7 sm:leading-8">
                         <div
@@ -376,6 +383,7 @@ export default function LessonPage() {
                     </section>
                 )}
 
+                {/* یادداشت‌ها */}
                 <section className="mt-6 sm:mt-10 p-3 sm:p-6 bg-sage-50 dark:bg-stone-900/40 rounded-xl sm:rounded-2xl">
                     <div className="flex justify-between items-center mb-2.5 sm:mb-4 gap-3">
                         <h2 className="text-sm sm:text-lg font-bold text-stone-800 dark:text-stone-200">

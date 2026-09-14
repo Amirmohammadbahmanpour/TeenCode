@@ -1,165 +1,179 @@
 "use client";
 
+import Link from "next/link";
 import {
     Instagram,
-    Linkedin,
+    PhoneCall,
     Mail,
-    Phone,
-    LogIn,
-    UserPlus,
+    MessageCircle,
 } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 export default function Footer() {
-    const currentYear = new Date().getFullYear();
-    const pathname = usePathname();
-
     return (
         <footer
-            id="contact-us"
-            className="w-full max-w-full overflow-hidden bg-stone-50 dark:bg-stone-950 border-t border-stone-200 dark:border-stone-900 px-3 sm:px-5 lg:px-6 py-7 sm:py-10 lg:pt-16 lg:pb-8 transition-colors duration-300"
+            className="border-t border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-950"
             dir="rtl"
         >
-            <div className="w-full max-w-7xl mx-auto">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-7 sm:gap-x-8 sm:gap-y-10 lg:gap-10 mb-7 sm:mb-10 lg:mb-14">
+            <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+                <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
 
                     {/* برند */}
-                    <div className="col-span-2 lg:col-span-1 flex flex-col items-center lg:items-start text-center lg:text-right">
-                        <h2 className="text-xl sm:text-2xl font-black text-stone-800 dark:text-white mb-2.5 sm:mb-4">
-                            تین <span className="text-sage-600 dark:text-sage-500">کد</span>
-                        </h2>
+                    <div>
+                        <h3 className="text-xl font-black text-stone-800 dark:text-stone-100">
+                            نوجوانه
+                        </h3>
 
-                        <p className="text-[10px] sm:text-sm text-stone-500 dark:text-stone-400 leading-5 sm:leading-7 max-w-sm mb-3.5 sm:mb-5">
-                            همراه شما در مسیر تحول و رشد شخصی با متدهای مدرن و طراحی مینیمال.
+                        <p className="mt-3 max-w-xs text-sm leading-7 text-stone-500 dark:text-stone-400">
+                            مسیر رشد و یادگیری برای ساختن آینده‌ای بهتر.
                         </p>
 
-                        <div className="flex gap-2 sm:gap-3">
-                            {[
-                                {
-                                    icon: <Instagram size={16} className="sm:w-[18px] sm:h-[18px]" />,
-                                    href: "https://instagram.com",
-                                    name: "اینستاگرام",
-                                },
-                                {
-                                    icon: <Linkedin size={16} className="sm:w-[18px] sm:h-[18px]" />,
-                                    href: "https://linkedin.com",
-                                    name: "لینکدین",
-                                },
-                                {
-                                    icon: <Mail size={16} className="sm:w-[18px] sm:h-[18px]" />,
-                                    href: "mailto:hello@teencode.ir",
-                                    name: "ایمیل",
-                                },
-                            ].map((social, index) => (
-                                <Link
-                                    key={index}
-                                    href={social.href}
-                                    target="_blank"
-                                    aria-label={social.name}
-                                    className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center bg-white dark:bg-stone-900 text-stone-400 dark:text-stone-500 hover:text-sage-600 dark:hover:text-sage-400 rounded-xl sm:rounded-2xl transition-colors shadow-sm border border-stone-100 dark:border-stone-800"
-                                >
-                                    {social.icon}
-                                </Link>
-                            ))}
+                        <div className="mt-5 flex items-center gap-2">
+                            <a
+                                href="https://instagram.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-stone-100 text-stone-500 transition hover:bg-sage-100 hover:text-sage-600 dark:bg-stone-900 dark:hover:bg-stone-800"
+                            >
+                                <Instagram size={18} />
+                            </a>
+
+                            <a
+                                href="tel:09025825382" 
+                                className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-stone-100 text-stone-500 transition hover:bg-sage-100 hover:text-sage-600 dark:bg-stone-900 dark:hover:bg-stone-800"
+                                aria-label="تماس با ما"
+                            >
+                                <PhoneCall size={18} />
+                            </a>
+
+                            <a
+                                href="mailto:amirmohammadbahmann@gmail.com.ir"
+                                className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-stone-100 text-stone-500 transition hover:bg-sage-100 hover:text-sage-600 dark:bg-stone-900 dark:hover:bg-stone-800"
+                            >
+                                <Mail size={18} />
+                            </a>
                         </div>
                     </div>
 
                     {/* دسترسی سریع */}
-                    <div className="text-center lg:text-right">
-                        <h3 className="text-[12px] sm:text-sm lg:text-base font-bold text-stone-800 dark:text-white mb-3 sm:mb-5">
+                    <div>
+                        <h4 className="mb-4 text-sm font-bold text-stone-800 dark:text-stone-100">
                             دسترسی سریع
-                        </h3>
+                        </h4>
 
-                        <ul className="space-y-2 sm:space-y-3 text-[10px] sm:text-sm text-stone-500 dark:text-stone-400">
-                            <li><Link href="/" className="hover:text-sage-600 dark:hover:text-sage-400 transition-colors">صفحه اصلی</Link></li>
-                            <li><Link href="/#about-us" className="hover:text-sage-600 dark:hover:text-sage-400 transition-colors">داستان ما</Link></li>
-                            <li><Link href="/#FAQ" className="hover:text-sage-600 dark:hover:text-sage-400 transition-colors">سوالات متداول</Link></li>
-                            <li><Link href="/blog" className="hover:text-sage-600 dark:hover:text-sage-400 transition-colors">وبلاگ</Link></li>
-                            <li><Link href="/courses" className="hover:text-sage-600 dark:hover:text-sage-400 transition-colors">دوره‌ها</Link></li>
-                        </ul>
+                        <div className="space-y-3 text-sm text-stone-500 dark:text-stone-400">
+                            <Link
+                                href="/"
+                                className="block cursor-pointer transition hover:text-sage-600"
+                            >
+                                صفحه اصلی
+                            </Link>
+
+                            <Link
+                                href="/courses"
+                                className="block cursor-pointer transition hover:text-sage-600"
+                            >
+                                دوره‌ها
+                            </Link>
+
+                            <Link
+                                href="/blog"
+                                className="block cursor-pointer transition hover:text-sage-600"
+                            >
+                                وبلاگ
+                            </Link>
+
+                            <Link
+                                href="/support"
+                                className="block cursor-pointer transition hover:text-sage-600"
+                            >
+                                پشتیبانی
+                            </Link>
+                        </div>
                     </div>
 
                     {/* ارتباط با ما */}
-                    <div className="flex flex-col items-center lg:items-start text-center lg:text-right">
-                        <h3 className="text-[12px] sm:text-sm lg:text-base font-bold text-stone-800 dark:text-white mb-3 sm:mb-5">
+                    <div className="sm:col-span-2 lg:col-span-2">
+                        <h4 className="mb-4 text-sm font-bold text-stone-800 dark:text-stone-100">
                             ارتباط با ما
-                        </h3>
+                        </h4>
 
-                        <ul className="space-y-2.5 sm:space-y-3">
-                            <li className="flex items-center justify-center lg:justify-start gap-2 sm:gap-3 text-[10px] sm:text-sm text-stone-500 dark:text-stone-400">
-                                <div className="w-7 h-7 sm:w-8 sm:h-8 shrink-0 rounded-lg bg-sage-100 dark:bg-sage-900/30 flex items-center justify-center text-sage-600 dark:text-sage-400">
-                                    <Phone size={14} className="sm:w-4 sm:h-4" />
+                        <div className="mb-5 flex items-start gap-2.5">
+                            <MessageCircle
+                                size={18}
+                                className="mt-0.5 shrink-0 text-sage-600"
+                            />
+
+                            <p className="text-sm leading-7 text-stone-500 dark:text-stone-400">
+                                برای دریافت مشاوره و ویزیت تخصصی و همچنین
+                                دسترسی به محتوای ویدیویی و خدمات مام‌اپ،
+                                می‌توانید از لینک‌های زیر استفاده کنید.
+                            </p>
+                        </div>
+
+                        {/* سرویس‌ها */}
+                        <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-3">
+
+                            {/* آپارات */}
+                            <a
+                                href="https://share.google/TeFcUp8Wa1Dr9LKf1"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group flex min-h-[64px] cursor-pointer items-center justify-center gap-3 rounded-xl border border-stone-100 bg-stone-50 px-4 py-3 transition-all hover:-translate-y-0.5 hover:border-orange-200 hover:bg-orange-50 dark:border-stone-800 dark:bg-stone-900 dark:hover:bg-stone-800"
+                            >
+                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-sm font-black text-orange-600 transition-transform group-hover:scale-105 dark:bg-orange-950/40 dark:text-orange-400">
+                                    A
                                 </div>
-                                <span dir="ltr">۰۲۱-۱۲۳۴۵۶۷۸</span>
-                            </li>
 
-                            <li className="flex items-center justify-center lg:justify-start gap-2 sm:gap-3 text-[10px] sm:text-sm text-stone-500 dark:text-stone-400">
-                                <div className="w-7 h-7 sm:w-8 sm:h-8 shrink-0 rounded-lg bg-sage-100 dark:bg-sage-900/30 flex items-center justify-center text-sage-600 dark:text-sage-400">
-                                    <Mail size={14} className="sm:w-4 sm:h-4" />
+                                <span className="text-sm font-bold text-stone-700 dark:text-stone-200">
+                                    آپارات
+                                </span>
+                            </a>
+
+                            {/* مام‌اپ */}
+                            <a
+                                href="https://share.google/ZwXW5hVFvuKvDRlxZ"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group flex min-h-[64px] cursor-pointer items-center justify-center gap-3 rounded-xl border border-stone-100 bg-stone-50 px-4 py-3 transition-all hover:-translate-y-0.5 hover:border-pink-200 hover:bg-pink-50 dark:border-stone-800 dark:bg-stone-900 dark:hover:bg-stone-800"
+                            >
+                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-pink-100 text-sm font-black text-pink-600 transition-transform group-hover:scale-105 dark:bg-pink-950/40 dark:text-pink-400">
+                                    M
                                 </div>
-                                <span className="truncate">hello@teencode.ir</span>
-                            </li>
-                        </ul>
+
+                                <span className="text-sm font-bold text-stone-700 dark:text-stone-200">
+                                    مام‌اپ
+                                </span>
+                            </a>
+
+                            {/* بازار */}
+                            <a
+                                href="http://cafebazaar.ir/app/?id=ir.mumapp.patient&ref=share"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group flex min-h-[64px] cursor-pointer items-center justify-center gap-3 rounded-xl border border-stone-100 bg-stone-50 px-4 py-3 transition-all hover:-translate-y-0.5 hover:border-green-200 hover:bg-green-50 dark:border-stone-800 dark:bg-stone-900 dark:hover:bg-stone-800"
+                            >
+                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-100 text-sm font-black text-green-600 transition-transform group-hover:scale-105 dark:bg-green-950/40 dark:text-green-400">
+                                    B
+                                </div>
+
+                                <span className="text-sm font-bold text-stone-700 dark:text-stone-200">
+                                    بازار
+                                </span>
+                            </a>
+
+                        </div>
                     </div>
-
-                    
-                    {/* حساب کاربری */}
-                    <div className="col-span-2 lg:col-span-1 flex flex-col items-center lg:items-start text-center lg:text-right">
-    <h3 className="text-[12px] sm:text-sm lg:text-base font-bold text-stone-800 dark:text-white mb-3 sm:mb-5">
-        حساب کاربری
-    </h3>
-
-    <div className="w-full max-w-sm lg:max-w-none flex flex-col gap-1.5 sm:gap-2">
-        <Link
-            href={pathname === "/login" ? "/" : "/login"}
-            className="w-full flex items-center gap-2 px-2.5 sm:px-3 py-2 sm:py-2.5 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-lg sm:rounded-xl hover:border-sage-400 dark:hover:border-sage-700 transition-colors group"
-        >
-            <div className="w-6 h-6 sm:w-7 sm:h-7 shrink-0 rounded-md sm:rounded-lg bg-stone-100 dark:bg-stone-800 flex items-center justify-center text-stone-500 dark:text-stone-400 group-hover:bg-sage-100 group-hover:text-sage-600 dark:group-hover:bg-sage-900/30 dark:group-hover:text-sage-400 transition-colors">
-                <LogIn size={12} className="sm:w-3.5 sm:h-3.5" />
-            </div>
-
-            <span className="text-[10px] sm:text-xs font-bold text-stone-700 dark:text-stone-200 group-hover:text-sage-600 dark:group-hover:text-sage-400 transition-colors">
-                ورود به حساب
-            </span>
-        </Link>
-
-        <Link
-            href={pathname === "/register" ? "/" : "/register"}
-            className="w-full flex items-center gap-2 px-2.5 sm:px-3 py-2 sm:py-2.5 bg-sage-600 hover:bg-sage-700 text-white rounded-lg sm:rounded-xl transition-colors"
-        >
-            <div className="w-6 h-6 sm:w-7 sm:h-7 shrink-0 rounded-md sm:rounded-lg bg-white/15 flex items-center justify-center">
-                <UserPlus size={12} className="sm:w-3.5 sm:h-3.5" />
-            </div>
-
-            <span className="text-[10px] sm:text-xs font-bold">
-                ثبت‌نام جدید
-            </span>
-        </Link>
-    </div>
-
-    <p className="text-[8px] sm:text-[10px] text-stone-400 dark:text-stone-500 mt-2 leading-4 text-center lg:text-right">
-        با عضویت در تین کد، به دوره‌های آموزشی دسترسی پیدا کنید.
-    </p>
-                    </div>
-
-
                 </div>
 
-                {/* کپی‌رایت */}
-                <div className="border-t border-stone-200 dark:border-stone-900 pt-4 sm:pt-6 flex flex-col md:flex-row justify-between items-center gap-2.5 sm:gap-4 text-stone-400 dark:text-stone-500 text-[9px] sm:text-xs font-medium">
-                    <p suppressHydrationWarning>
-                        © {currentYear} تین کد. تمامی حقوق محفوظ است.
+                {/* پایین Footer */}
+                <div className="mt-8 flex flex-col gap-3 border-t border-stone-100 pt-6 text-center text-xs text-stone-400 sm:flex-row sm:items-center sm:justify-between sm:text-right dark:border-stone-800">
+                    <p>
+                        © {new Date().getFullYear()} نوجوانه. تمامی حقوق محفوظ است.
                     </p>
 
-                    <div className="flex gap-4 sm:gap-6">
-                        <Link href="/terms" className="hover:text-stone-600 dark:hover:text-stone-300 transition-colors">
-                            قوانین و مقررات
-                        </Link>
-                        <Link href="/privacy" className="hover:text-stone-600 dark:hover:text-stone-300 transition-colors">
-                            حریم خصوصی
-                        </Link>
-                    </div>
+                    <p>
+                        ساخته شده با ❤️ برای نسل آینده
+                    </p>
                 </div>
             </div>
         </footer>

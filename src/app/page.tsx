@@ -9,7 +9,7 @@ import FinalCTA from "@/components/final-cta";
 
 // ========== متادیتا برای سئو ==========
 export const metadata = {
-    title: "نوجوانه | آموزش تربیت نوجوان و تحول فردی برای مادران",
+    title: "نوجوانه؛ همراه با مادران در فصل جوانه‌زدن نوجوانان",
     description:
         "دوره جامع تربیت نوجوان و تحول شخصی برای مادران آگاه. با متدهای نوین آموزشی، مسیر رشد خود و فرزندتان را هموار کنید.",
     keywords:
@@ -26,7 +26,7 @@ export const metadata = {
                 url: "/og-image.jpg",
                 width: 1200,
                 height: 630,
-                alt: "تین کد - آموزش تربیت نوجوان",
+                alt: "نوجوانه - آموزش و تربیت نوجوان",
             },
         ],
         locale: "fa_IR",
@@ -200,11 +200,11 @@ export default async function Home() {
                     {/* متن Hero */}
                     <div className="w-full lg:flex-1 min-w-0 text-center lg:text-right">
                         <div className="space-y-3 sm:space-y-5 lg:space-y-6">
-                            <h1 className="text-[22px] sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black text-stone-800 dark:text-white leading-[1.65] sm:leading-[1.4] lg:leading-[1.25]">
-                                نوجوانه، شناسایی
+                            <h1 className="text-[20px] sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black text-stone-800 dark:text-white leading-[1.65] sm:leading-[1.4] lg:leading-[1.3]">
+                                نوجوانه؛ همراه مادران
                                 <br />
                                 <span className="text-sage-600 dark:text-sage-500">
-                                    بیشتر جوانان و نوجوانان
+                                    در فصل جوانه‌زدن نوجوانان
                                 </span>
                             </h1>
 
@@ -240,8 +240,8 @@ export default async function Home() {
                             <div className="absolute -inset-4 sm:-inset-8 bg-sage-200/40 dark:bg-sage-900/20 blur-[35px] sm:blur-[60px] rounded-full opacity-60 pointer-events-none" />
 
                             <Image
-                                src="/banner-img.webp"
-                                alt="تین کد - آموزش تربیت نوجوان"
+                                src="/favicon.png"
+                                alt=" نوجوانه - آموزش تربیت نوجوان"
                                 width={600}
                                 height={600}
                                 className="relative w-full h-auto rounded-[1.25rem] sm:rounded-[2rem] lg:rounded-[2.5rem] drop-shadow-xl sm:drop-shadow-2xl transition-transform duration-700 hover:scale-[1.02]"
