@@ -365,10 +365,12 @@ export default function LessonPage() {
 
                         <audio
                             controls
-                            controlsList="nodownload"
-                            className="w-full h-9 sm:h-auto"
-                            src={lesson.podcast_url}
-                        />
+                            preload="metadata"
+                            className="w-full"
+                        >
+                            <source src={lesson.podcast_url} type="audio/mp4" />
+                            مرورگر شما از پخش این فایل صوتی پشتیبانی نمی‌کند.
+                        </audio>
                     </div>
                 )}
 
