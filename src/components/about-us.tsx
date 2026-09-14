@@ -125,24 +125,26 @@ export default function AboutUs({ profile }: AboutUsProps) {
                                 dark:bg-stone-900
                             "
                         >
-                            <Image
-                                src="/tem-img.png"
-                                alt="تیم ما"
-                                width={1000}
-                                height={700}
-                                priority
-                                className="
-                                    w-full
-                                    h-[135px]
-                                    sm:h-[220px]
-                                    md:h-[320px]
-                                    lg:h-[550px]
-                                    object-cover
-                                    transition-transform
-                                    duration-700
-                                    group-hover:scale-[1.02]
-                                "
-                            />
+                            <Image 
+                            src="/tem-img.png"
+                            alt="تیم ما"
+                            width={1000}
+                            height={700}
+                            priority
+                            className="
+                                w-full
+                                h-[135px]
+                                sm:h-[220px]
+                                md:h-[320px]
+                                lg:h-[550px]
+                                object-cover
+                                object-[center_20%]
+                                sm:object-center
+                                transition-transform
+                                duration-700
+                                group-hover:scale-[1.02]
+                            "
+                        />
 
                             <div
                                 className="
