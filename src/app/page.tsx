@@ -235,37 +235,20 @@ export default async function Home() {
                     </div>
 
                     {/* تصویر Hero */}
-
                     <div className="w-full lg:flex-1 min-w-0 flex justify-center lg:justify-end">
-    <div className="relative w-full max-w-[190px] sm:max-w-[280px] md:max-w-[350px] lg:max-w-[460px] xl:max-w-[520px]">
-        <div className="absolute -inset-4 sm:-inset-8 bg-sage-200/40 dark:bg-sage-900/20 blur-[35px] sm:blur-[60px] rounded-full opacity-60 pointer-events-none" />
+                        <div className="relative w-full max-w-[190px] sm:max-w-[280px] md:max-w-[350px] lg:max-w-[460px] xl:max-w-[520px]">
+                            <div className="absolute -inset-4 sm:-inset-8 bg-sage-200/40 dark:bg-sage-900/20 blur-[35px] sm:blur-[60px] rounded-full opacity-60 pointer-events-none" />
 
-        <div className="relative overflow-hidden rounded-[1.25rem] sm:rounded-[2rem] lg:rounded-[2.5rem]">
-            
-            {/* Light Mode */}
-            <Image
-                src="/favicon.png"
-                alt=" نوجوانه - آموزش تربیت نوجوان"
-                width={600}
-                height={600}
-                className="relative w-full h-auto drop-shadow-xl sm:drop-shadow-2xl transition-transform duration-700 hover:scale-[1.02] block dark:hidden"
-                priority
-            />
-
-            {/* Dark Mode */}
-            <Image
-                src="/favicon2.png"
-                alt=" نوجوانه - آموزش تربیت نوجوان"
-                width={600}
-                height={600}
-                className="relative w-full h-auto drop-shadow-xl sm:drop-shadow-2xl transition-transform duration-700 hover:scale-[1.02] hidden dark:block"
-                priority
-            />
-
-        </div>
-    </div>
+                            <Image
+                                src="/favicon.png"
+                                alt=" نوجوانه - آموزش تربیت نوجوان"
+                                width={600}
+                                height={600}
+                                className="relative w-full h-auto rounded-[1.25rem] sm:rounded-[2rem] lg:rounded-[2.5rem] drop-shadow-xl sm:drop-shadow-2xl transition-transform duration-700 hover:scale-[1.02]"
+                                priority
+                            />
+                        </div>
                     </div>
-
                 </div>
             </section>
 
