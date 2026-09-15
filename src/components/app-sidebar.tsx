@@ -58,6 +58,7 @@ export function AppSidebar() {
   const fetchUserData = useCallback(async () => {
     const token = auth.getToken();
 
+    // اگر توکن وجود نداشته باشد، کاربر مهمان است
     if (!token) {
       setUser(null);
       setIsProfileComplete(false);
@@ -67,6 +68,7 @@ export function AppSidebar() {
     }
 
     try {
+      // اعتبار واقعی توکن توسط سرور بررسی می‌شود
       const response = await api.get("/user");
       const userData = response.data;
 
@@ -81,9 +83,37 @@ export function AppSidebar() {
 
       const isUserAdmin = userData.profile?.role === "admin";
       setIsAdmin(isUserAdmin);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error fetching user:", error);
 
+      const status = error?.response?.status;
+
+      /*
+       * فقط در صورتی که سرور صراحتاً session را رد کرده باشد
+       * کاربر را logout می‌کنیم.
+       *
+       * 401 = توکن نامعتبر یا منقضی
+       * 403 = دسترسی/session رد شده
+       */
+      if (status === 401 || status === 403) {
+        try {
+          await auth.logout();
+        } catch (logoutError) {
+          console.error("Auth logout error:", logoutError);
+        }
+
+        setUser(null);
+        setIsProfileComplete(false);
+        setIsAdmin(false);
+
+        return;
+      }
+
+      /*
+       * خطاهای موقتی مثل:
+       * 500، خطای شبکه و ...
+       * نباید باعث logout شدن کاربر شوند.
+       */
       setUser(null);
       setIsProfileComplete(false);
       setIsAdmin(false);
@@ -92,12 +122,12 @@ export function AppSidebar() {
     }
   }, []);
 
-  // بررسی اولیه کاربر
+  // بررسی اولیه وضعیت ورود
   useEffect(() => {
     fetchUserData();
   }, [fetchUserData]);
 
-  // گوش دادن به تغییر پروفایل
+  // بعد از تکمیل یا تغییر پروفایل، اطلاعات کاربر دوباره دریافت شود
   useEffect(() => {
     const handleProfileUpdate = () => {
       fetchUserData();
@@ -161,7 +191,7 @@ export function AppSidebar() {
     },
   ];
 
-  const renderMenuItems = (items: typeof publicItems) => (
+  const renderMenuItems = (items: typeof publicItems) =>
     items.map((item) => {
       const isActive = pathname === item.url;
 
@@ -199,8 +229,7 @@ export function AppSidebar() {
           </SidebarMenuButton>
         </SidebarMenuItem>
       );
-    })
-  );
+    });
 
   if (loading) {
     return (
@@ -274,6 +303,7 @@ export function AppSidebar() {
                       className="flex items-center gap-3 justify-center"
                     >
                       <Podcast className="h-5 w-5" />
+
                       <span className="font-bold">
                         ورود / ثبت‌نام
                       </span>
@@ -308,6 +338,7 @@ export function AppSidebar() {
                 className="py-6 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
               >
                 <LogOut className="h-5 w-5" />
+
                 <span className="font-bold">
                   خروج از حساب
                 </span>
