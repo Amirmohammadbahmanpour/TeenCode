@@ -683,13 +683,14 @@ export default function Dashboard() {
                             شما با موفقیت دوره تحول فردی را به پایان رساندید
                         </p>
 
-                        <button className="bg-white text-amber-600 px-5 sm:px-8 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-[11px] sm:text-sm font-bold hover:bg-stone-100 transition-colors inline-flex items-center gap-1.5">
-
+                        <Link
+                            href="/quiz/posttest/result"
+                            className="bg-white text-amber-600 px-5 sm:px-8 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-[11px] sm:text-sm font-bold hover:bg-stone-100 transition-colors inline-flex items-center gap-1.5"
+                        >
                             <Award size={16} />
 
                             دریافت مدرک افتخار
-
-                        </button>
+                        </Link>
 
                     </section>
                 )}
