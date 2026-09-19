@@ -19,7 +19,7 @@ export default function FinalCTA({ profile, isLoggedIn }: FinalCTAProps) {
     const content = !isLoggedIn
         ? {
             title: "آماده‌ای برای شروع؟",
-            highlight: "به خانواده تین کد بپیوند",
+            highlight: "به خانواده نوجوانه بپیوندید",
             desc: "همین حالا ثبت‌نام کن و اولین قدم رو برای تحول شخصی و یادگیری مهارت‌های نوین بردار.",
             btnText: "شروع یادگیری",
             btnLink: "/login",
