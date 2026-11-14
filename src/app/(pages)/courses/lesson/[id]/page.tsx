@@ -16,15 +16,15 @@ interface PageProps {
 }
 
 async function getLesson(id: string): Promise<Lesson | null> {
+    const API_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
+
     try {
-        const response = await fetch(
-            `https://api.noojavaneh.ir/api/lessons/${id}`,
-            {
-                next: {
-                    revalidate: 300,
-                },
-            }
-        );
+        const response = await fetch(`${API_URL}/lessons/${id}`, {
+            next: {
+                revalidate: 300,
+            },
+        });
 
         if (!response.ok) {
             return null;

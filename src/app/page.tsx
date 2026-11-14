@@ -119,7 +119,7 @@ async function getUserData(
                 cache: "no-store",
             }),
 
-            fetch(`${API_URL}/user-progress?user_id=${user.id}`, {
+            fetch(`${API_URL}/my-progress`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
