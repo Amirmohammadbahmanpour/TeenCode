@@ -83,10 +83,22 @@ export default function ChapterList({
                     isLocked = !entranceExamPassed;
                 } 
                 else if (isFinalExamRow) {
-                    // آزمون نهایی: وابسته به تکمیل همه دروس فصل‌های قبل
-                    const allPreviousLessons = chapters.slice(1, index).flatMap(ch => ch.lessons);
-                    const allLessonsDone = allPreviousLessons.every(lesson => completedLessonIds.includes(lesson.id));
-                    isLocked = !allLessonsDone;
+                    // آزمون نهایی: با تکمیل دروس تا پایان فصل سوم باز می‌شود
+                    const ch3Index = chapters.findIndex(ch => 
+                        ch.slug === 'focus-management' || 
+                        ch.title?.includes('فصل سوم') || 
+                        ch.title?.includes('فصل ۳')
+                    );
+
+                    const chaptersUpToThree = ch3Index !== -1 
+                        ? chapters.slice(1, ch3Index + 1)
+                        : chapters.filter(ch => ch.slug !== 'placement-test' && ch.slug !== 'final-test').slice(0, 3);
+
+                    const lessonsUpToThree = chaptersUpToThree.flatMap(ch => ch.lessons);
+                    const isUpToChapterThreeDone = lessonsUpToThree.length > 0 && 
+                        lessonsUpToThree.every(lesson => completedLessonIds.includes(lesson.id));
+
+                    isLocked = !isUpToChapterThreeDone;
                 } 
                 else {
                     // ✅ فصل‌های معمولی: بررسی کامل شدن همه دروس فصل قبل
