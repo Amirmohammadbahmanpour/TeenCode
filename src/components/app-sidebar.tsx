@@ -146,7 +146,11 @@ export function AppSidebar() {
     setUser(null);
     setIsProfileComplete(false);
     setIsAdmin(false);
+    if (isMobile) {
+      setOpenMobile(false);
+    }
     await auth.logout();
+    window.location.href = "/login";
   };
 
   const handleItemClick = () => {

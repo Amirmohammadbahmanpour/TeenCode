@@ -67,21 +67,30 @@ class AuthService {
     async logout(): Promise<void> {
         try {
             const token = this.getToken();
-            // پاکسازی فوری کوکی‌ها و حافظه لوکال
+
+            // پاکسازی فوری و کامل تمام کوکی‌های احراز هویت
             Cookies.remove(this.TOKEN_KEY, { path: '/' });
             Cookies.remove(this.USER_KEY, { path: '/' });
             Cookies.remove(this.TOKEN_KEY);
             Cookies.remove(this.USER_KEY);
 
+            if (typeof document !== 'undefined') {
+                document.cookie = `${this.TOKEN_KEY}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT; Max-Age=0;`;
+                document.cookie = `${this.USER_KEY}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT; Max-Age=0;`;
+                document.cookie = `${this.TOKEN_KEY}=; Expires=Thu, 01 Jan 1970 00:00:01 GMT; Max-Age=0;`;
+                document.cookie = `${this.USER_KEY}=; Expires=Thu, 01 Jan 1970 00:00:01 GMT; Max-Age=0;`;
+            }
+
             if (typeof window !== 'undefined') {
                 localStorage.removeItem('user');
                 localStorage.removeItem('auth_token');
+                sessionStorage.clear();
                 window.dispatchEvent(new Event('auth-changed'));
                 window.dispatchEvent(new Event('profile-updated'));
             }
 
             if (token) {
-                await api.post('/logout').catch(() => {});
+                api.post('/logout').catch(() => {});
             }
         } catch (error) {
             console.error('Logout error:', error);

@@ -104,12 +104,12 @@ export default function LoginPage() {
 
     return (
         <div
-            className="min-h-screen w-full bg-white dark:bg-stone-950"
+            className="h-[calc(100vh-4rem)] w-full bg-white dark:bg-stone-950 overflow-hidden"
             dir="rtl"
         >
-            <div className="min-h-screen flex flex-col md:flex-row">
+            <div className="h-full w-full flex flex-col md:flex-row overflow-hidden">
                 {/* بخش بنر */}
-                <div className="relative hidden overflow-hidden bg-sage-600 p-10 md:flex md:w-1/2 md:items-center md:justify-center md:p-12 dark:bg-stone-900 lg:p-16">
+                <div className="relative hidden overflow-hidden bg-sage-600 p-8 md:flex md:w-1/2 md:items-center md:justify-center dark:bg-stone-900 lg:p-12">
                     <div className="absolute inset-0 opacity-10">
                         <div className="absolute left-10 top-10 h-64 w-64 rounded-full bg-white blur-3xl" />
                         <div className="absolute bottom-10 right-10 h-48 w-48 rounded-full bg-white blur-3xl" />
@@ -127,8 +127,8 @@ export default function LoginPage() {
                 </div>
 
                 {/* بخش فرم */}
-                <div className="flex min-h-screen flex-1 items-center justify-center px-4 py-8 sm:px-6 sm:py-10 md:min-h-0 md:p-10 lg:p-12">
-                    <div className="w-full max-w-md space-y-6 sm:space-y-8">
+                <div className="flex h-full flex-1 items-center justify-center px-4 py-6 sm:px-6 md:p-8 lg:p-10 overflow-y-auto">
+                    <div className="w-full max-w-md space-y-5 sm:space-y-6 my-auto">
                         <div className="text-right">
                             <h2 className="text-2xl font-bold italic text-stone-800 sm:text-3xl dark:text-stone-100">
                                 نوجوانه
@@ -157,14 +157,14 @@ export default function LoginPage() {
                                     required
                                     maxLength={11}
                                     placeholder="شماره موبایل"
-                                    className="w-full rounded-xl border border-stone-200 bg-stone-50 py-3.5 pl-4 pr-12 text-sm text-stone-800 outline-none transition-all focus:border-sage-500 focus:ring-2 focus:ring-sage-500/20 sm:rounded-2xl sm:py-4 sm:text-base dark:border-stone-800 dark:bg-stone-900 dark:text-white"
+                                    className="w-full rounded-xl border border-stone-200 bg-stone-50 py-3.5 pl-4 pr-12 text-sm text-stone-800 outline-none transition-all focus:border-sage-500 focus:ring-2 focus:ring-sage-500/20 sm:rounded-2xl sm:py-4 sm:text-base dark:border-stone-800 dark:bg-stone-900 dark:text-white text-right placeholder:text-right"
                                     value={phone}
                                     onChange={(e) =>
                                         setPhone(
                                             e.target.value.replace(/\D/g, "")
                                         )
                                     }
-                                    dir="ltr"
+                                    dir="rtl"
                                 />
                             </div>
 
@@ -179,11 +179,12 @@ export default function LoginPage() {
                                     required
                                     autoComplete="current-password"
                                     placeholder="رمز عبور"
-                                    className="w-full rounded-xl border border-stone-200 bg-stone-50 py-3.5 pl-4 pr-12 text-sm text-stone-800 outline-none transition-all focus:border-sage-500 focus:ring-2 focus:ring-sage-500/20 sm:rounded-2xl sm:py-4 sm:text-base dark:border-stone-800 dark:bg-stone-900 dark:text-white"
+                                    className="w-full rounded-xl border border-stone-200 bg-stone-50 py-3.5 pl-4 pr-12 text-sm text-stone-800 outline-none transition-all focus:border-sage-500 focus:ring-2 focus:ring-sage-500/20 sm:rounded-2xl sm:py-4 sm:text-base dark:border-stone-800 dark:bg-stone-900 dark:text-white text-right placeholder:text-right"
                                     value={password}
                                     onChange={(e) =>
                                         setPassword(e.target.value)
                                     }
+                                    dir="rtl"
                                 />
                             </div>
 
