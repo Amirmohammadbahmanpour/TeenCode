@@ -28,8 +28,19 @@ api.interceptors.request.use(
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401) {
+        const url = error.config?.url || '';
+        const isAuthEndpoint = 
+            url.includes('/login') || 
+            url.includes('/send-otp') || 
+            url.includes('/register-otp') ||
+            url.includes('/reset-password') ||
+            url.includes('/send-reset-code') ||
+            url.includes('/logout');
+
+        if (error.response?.status === 401 && !isAuthEndpoint) {
             console.log("🔒 401 Unauthorized - Logging out");
+            Cookies.remove('auth_token', { path: '/' });
+            Cookies.remove('user', { path: '/' });
             Cookies.remove('auth_token');
             Cookies.remove('user');
             if (typeof window !== 'undefined') {

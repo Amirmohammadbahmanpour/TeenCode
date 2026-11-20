@@ -133,17 +133,20 @@ export function AppSidebar() {
       fetchUserData();
     };
 
+    window.addEventListener("auth-changed", handleProfileUpdate);
     window.addEventListener("profile-updated", handleProfileUpdate);
 
     return () => {
+      window.removeEventListener("auth-changed", handleProfileUpdate);
       window.removeEventListener("profile-updated", handleProfileUpdate);
     };
   }, [fetchUserData]);
 
   const handleSignOut = async () => {
+    setUser(null);
+    setIsProfileComplete(false);
+    setIsAdmin(false);
     await auth.logout();
-    router.push("/login");
-    router.refresh();
   };
 
   const handleItemClick = () => {
