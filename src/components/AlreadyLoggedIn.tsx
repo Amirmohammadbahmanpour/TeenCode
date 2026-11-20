@@ -26,19 +26,19 @@ export default function AlreadyLoggedIn() {
         {/* دکمه‌ها */}
         <div className="space-y-3 relative z-10">
           <Link 
-            href="/dashboard" 
+            href="/" 
             className="flex items-center justify-center gap-2 w-full bg-sage-600 hover:bg-sage-700 text-white py-4 rounded-2xl font-bold transition-all shadow-lg shadow-sage-200/50 dark:shadow-none hover:-translate-y-1"
           >
-            <LayoutDashboard size={18} />
-            ورود به پنل کاربری
+            <Home size={18} />
+            رفتن به صفحه اصلی
           </Link>
 
           <Link 
-            href="/" 
+            href="/dashboard" 
             className="flex items-center justify-center gap-2 w-full bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 py-4 rounded-2xl font-bold transition-all hover:bg-stone-200 dark:hover:bg-stone-700"
           >
-            <Home size={18} />
-            بازگشت به خانه
+            <LayoutDashboard size={18} />
+            ورود به پنل کاربری
           </Link>
         </div>
 

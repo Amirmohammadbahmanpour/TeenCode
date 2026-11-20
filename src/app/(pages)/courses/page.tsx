@@ -201,7 +201,14 @@ async function getChaptersData(token: string): Promise<ChaptersData> {
     }
 }
 
-export default async function CoursesPage() {
+export default async function CoursesPage({
+    searchParams,
+}: {
+    searchParams?: Promise<{ chapter?: string }> | { chapter?: string };
+}) {
+    const sp = await searchParams;
+    const activeChapter = sp?.chapter;
+
     const userData = await getUserData();
     
     if (!userData) {
@@ -253,6 +260,7 @@ export default async function CoursesPage() {
                     completedLessonIds={completedLessonIds}
                     entranceExamPassed={entranceExamPassed}
                     finalExamPassed={finalExamPassed} 
+                    activeChapterId={activeChapter}
                 />
             </div>
         </div>

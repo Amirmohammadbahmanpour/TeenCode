@@ -23,6 +23,7 @@ interface ChapterListProps {
     completedLessonIds: string[];
     entranceExamPassed: boolean;
     finalExamPassed: boolean;
+    activeChapterId?: string;
 }
 
 // ========== کامپوننت اصلی ==========
@@ -30,7 +31,8 @@ export default function ChapterList({
     chapters, 
     completedLessonIds, 
     entranceExamPassed, 
-    finalExamPassed 
+    finalExamPassed,
+    activeChapterId
 }: ChapterListProps) {
     
     // لاگ برای دیباگ
@@ -42,6 +44,15 @@ export default function ChapterList({
     
     // محاسبه مقدار اولیه باز بودن
     const initialOpenChapterId = useMemo(() => {
+        // ۱. اگر فصل خاصی از طریق URL هدایت شده بود (مثلا بعد از اتمام درس)
+        if (activeChapterId) {
+            const matched = chapters.find(
+                ch => ch.id === activeChapterId || ch.slug === activeChapterId
+            );
+            if (matched) return matched.id;
+        }
+
+        // ۲. باز کردن پیش‌فرض فصل در حال مطالعه
         if (entranceExamPassed && chapters.length > 1) {
             return chapters[1]?.id || null;
         }
@@ -49,7 +60,7 @@ export default function ChapterList({
             return chapters[0]?.id || null;
         }
         return null;
-    }, [entranceExamPassed, chapters]);
+    }, [activeChapterId, entranceExamPassed, chapters]);
 
     const [openChapterId, setOpenChapterId] = useState<string | null>(initialOpenChapterId);
 
@@ -200,8 +211,33 @@ export default function ChapterList({
                                     ) : (
                                         /* ========== لیست دروس فصل ========== */
                                         <div className="grid gap-3">
-                                            {chapter.lessons && chapter.lessons.map((lesson: Lesson) => {
+                                            {chapter.lessons && [...chapter.lessons].sort((a, b) => a.order_index - b.order_index).map((lesson: Lesson, lessonIdx: number, allLessons: Lesson[]) => {
                                                 const isCompleted = isLessonCompleted(lesson.id);
+                                                
+                                                // درس بعدی باز می‌شود: اگر درس خودش کامل نشده و درس قبلی در این فصل هنوز کامل نشده، قفل است
+                                                const isLessonLocked = !isCompleted && lessonIdx > 0 && 
+                                                    !isLessonCompleted(allLessons[lessonIdx - 1].id);
+
+                                                if (isLessonLocked) {
+                                                    return (
+                                                        <div
+                                                            key={lesson.id}
+                                                            className="flex items-center justify-between p-5 rounded-2xl transition-all bg-stone-100/40 dark:bg-stone-900/20 opacity-60 border-2 border-transparent cursor-not-allowed select-none"
+                                                            title="ابتدا باید درس قبلی را کامل کنید"
+                                                        >
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors bg-stone-200 dark:bg-stone-800 text-stone-400 dark:text-stone-600 shadow-sm">
+                                                                    <Lock size={18} />
+                                                                </div>
+                                                                <span className="font-bold text-stone-400 dark:text-stone-600">
+                                                                    {lesson.title}
+                                                                </span>
+                                                            </div>
+                                                            <Lock size={16} className="text-stone-300 dark:text-stone-700" />
+                                                        </div>
+                                                    );
+                                                }
+
                                                 return (
                                                     <Link
                                                         key={lesson.id}

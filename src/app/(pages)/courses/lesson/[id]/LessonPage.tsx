@@ -194,14 +194,16 @@ export default function LessonPage() {
                 is_completed: true,
             });
 
-            toast.success("درس با موفقیت تکمیل شد!");
+            toast.success("این درس با موفقیت تکمیل شد!");
 
             window.dispatchEvent(new Event("progress-updated"));
 
+            const chapterParam = (lesson as any)?.category_id || (lesson?.category as any)?.id || (lesson?.category as any)?.slug || "";
+
             setTimeout(() => {
-                router.push("/courses");
-                router.refresh();
-            }, 2000);
+                const targetUrl = chapterParam ? `/courses?chapter=${chapterParam}` : "/courses";
+                window.location.href = targetUrl;
+            }, 600);
         } catch (err: unknown) {
             const error = err as ApiError;
 
@@ -211,7 +213,6 @@ export default function LessonPage() {
                 error.response?.data?.message ||
                     "خطا در ثبت پیشرفت"
             );
-        } finally {
             setIsSubmitting(false);
         }
     };
@@ -445,7 +446,7 @@ export default function LessonPage() {
                                 <CheckCircle2 size={19} />
 
                                 <span className="text-xs sm:text-base">
-                                    علامت‌گذاری به عنوان تکمیل شده
+                                    این درس را مطالعه کردم
                                 </span>
                             </>
                         )}

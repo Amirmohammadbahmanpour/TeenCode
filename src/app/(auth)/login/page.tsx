@@ -27,7 +27,8 @@ export default function LoginPage() {
                     const response = await api.get("/user");
 
                     if (response.data) {
-                        setIsUser(true);
+                        window.location.href = "/";
+                        return;
                     }
                 } catch (error) {
                     auth.logout();
@@ -67,9 +68,9 @@ export default function LoginPage() {
             toast.success("خوش آمدید!");
 
             if (!response.data.profile?.full_name) {
-                router.push("/complete-profile");
+                window.location.href = "/complete-profile";
             } else {
-                router.push("/dashboard");
+                window.location.href = "/";
             }
         } catch (error: any) {
             if (error.response?.status === 401) {

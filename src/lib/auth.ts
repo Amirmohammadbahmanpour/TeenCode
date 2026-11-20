@@ -34,6 +34,9 @@ class AuthService {
     setToken(token: string): void {
         console.log("💾 Saving token:", token.substring(0, 20) + "...");
         Cookies.set(this.TOKEN_KEY, token, { expires: 7, path: '/' });
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(new Event('auth-changed'));
+        }
     }
 
     // دریافت کاربر از کوکی
@@ -47,6 +50,10 @@ class AuthService {
     setUser(user: User): void {
         console.log("👤 Saving user:", user);
         Cookies.set(this.USER_KEY, JSON.stringify(user), { expires: 7, path: '/' });
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(new Event('auth-changed'));
+            window.dispatchEvent(new Event('profile-updated'));
+        }
     }
 
     // بررسی لاگین بودن

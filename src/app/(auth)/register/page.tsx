@@ -29,7 +29,8 @@ export default function RegisterPage() {
                     const response = await api.get("/user");
 
                     if (response.data) {
-                        setIsUser(true);
+                        window.location.href = "/";
+                        return;
                     }
                 } catch (error) {
                     auth.logout();
