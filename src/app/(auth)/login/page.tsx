@@ -103,7 +103,7 @@ export default function LoginPage() {
 
     return (
         <div
-            className="min-h-screen w-full bg-white font-sans dark:bg-stone-950"
+            className="min-h-screen w-full bg-white dark:bg-stone-950"
             dir="rtl"
         >
             <div className="min-h-screen flex flex-col md:flex-row">

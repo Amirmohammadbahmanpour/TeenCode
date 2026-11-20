@@ -26,9 +26,14 @@ body {
   font-family: 'Vazirmatn', sans-serif;
 }
 
+input, button, select, textarea {
+  font-family: inherit;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --font-sans: 'Vazirmatn', sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-sidebar: var(--sidebar-background);

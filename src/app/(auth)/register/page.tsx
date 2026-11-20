@@ -162,7 +162,7 @@ export default function RegisterPage() {
     }
 
     return (
-        <div className="min-h-screen w-full overflow-x-hidden bg-stone-50 dark:bg-stone-950 font-sans" dir="rtl">
+        <div className="min-h-screen w-full overflow-x-hidden bg-stone-50 dark:bg-stone-950" dir="rtl">
             <div className="min-h-screen w-full flex flex-col md:flex-row">
 
                 {/* Banner - فقط دسکتاپ */}
