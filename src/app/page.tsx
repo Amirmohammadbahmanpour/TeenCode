@@ -14,19 +14,19 @@ export const metadata = {
         "دوره جامع تربیت نوجوان، رشد فردی و تحول عادات برای نوجوانان و همراهی با مادران آگاه. با متدهای نوین آموزشی، مسیر موفقیت و شکوفایی استعدادهای نوجوان خود را بسازید.",
     keywords:
         "نوجوان, نوجوانان, تربیت نوجوان, آموزش نوجوان, رشد فردی نوجوان, مهارتهای زندگی نوجوانان, روانشناسی نوجوان, بلوغ نوجوان, مدیریت زمان و تمرکز, هوش هیجانی, عادت سازی نوجوان, فرزندپروری, آموزش مادران, هدف گذاری نوجوان, مشاوره نوجوان, نوجوان موفق",
-    authors: [{ name: "نوجوانه" }],
+    authors: [{ name: "نوجوان" }],
     openGraph: {
-        title: "نوجوانه | مسیر تحول و رشد فردی نوجوانان و مادران",
+        title: "نوجوان | مسیر تحول و رشد فردی نوجوانان و مادران",
         description:
             "مسیر اختصاصی تحول نوجوانان؛ مهارت‌های تمرکز، عزت نفس، مدیریت زمان، هوش هیجانی و ارتباط با والدین.",
-        url: "https://noojavaneh.ir",
-        siteName: "نوجوانه",
+        url: "https://www.noojavaneh.ir",
+        siteName: "نوجوان",
         images: [
             {
                 url: "/course-banner.png",
                 width: 1200,
                 height: 630,
-                alt: "نوجوانه - پلتفرم رشد و تربیت نوجوان",
+                alt: "نوجوان - پلتفرم رشد و تربیت نوجوان",
             },
         ],
         locale: "fa_IR",
@@ -44,11 +44,27 @@ export const metadata = {
         },
     },
     alternates: {
-        canonical: "https://noojavaneh.ir",
+        canonical: "https://www.noojavaneh.ir",
     },
 };
 
 const homeSchemas = [
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "@id": "https://www.noojavaneh.ir/#website",
+        "url": "https://www.noojavaneh.ir/",
+        "name": "نوجوان",
+        "alternateName": [
+            "نوجوانه",
+            "پلتفرم نوجوان",
+            "noojavaneh.ir",
+            "www.noojavaneh.ir",
+            "noojavaneh"
+        ],
+        "description": "پلتفرم جامع رشد، مهارت و تحول فردی نوجوانان",
+        "inLanguage": "fa-IR"
+    },
     {
         "@context": "https://schema.org",
         "@type": "Course",

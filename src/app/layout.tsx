@@ -21,13 +21,14 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://noojavaneh.ir"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.noojavaneh.ir"),
   title: {
-    default: "نوجوانه | پلتفرم تخصصی رشد، مهارت و تحول فردی نوجوانان",
-    template: "%s | نوجوانه",
+    default: "نوجوان | پلتفرم تخصصی رشد، مهارت و تحول فردی نوجوانان",
+    template: "%s | نوجوان",
   },
+  applicationName: "نوجوان",
   description:
-    "نوجوانه؛ سامانه جامع آموزش و رشد فردی نوجوانان، پرورش مهارت‌های زندگی، مدیریت تمرکز و عادات و راهنمای مادران در مسیر همراهی با نوجوان.",
+    "نوجوان؛ سامانه جامع آموزش و رشد فردی نوجوانان، پرورش مهارت‌های زندگی، مدیریت تمرکز و عادات و راهنمای مادران در مسیر همراهی با نوجوان.",
   keywords: [
     "نوجوان",
     "نوجوانان",
@@ -49,14 +50,14 @@ export const metadata: Metadata = {
     "مشاوره نوجوان",
     "نوجوان موفق",
   ],
-  authors: [{ name: "نوجوانه", url: "https://noojavaneh.ir" }],
-  creator: "نوجوانه",
-  publisher: "نوجوانه",
+  authors: [{ name: "نوجوان", url: "https://www.noojavaneh.ir" }],
+  creator: "نوجوان",
+  publisher: "نوجوان",
   openGraph: {
-    title: "نوجوانه | پلتفرم تخصصی رشد و تحول فردی نوجوانان",
+    title: "نوجوان | پلتفرم تخصصی رشد و تحول فردی نوجوانان",
     description: "مسیر تحول نوجوانان؛ مهارت‌های تمرکز، عزت نفس، مدیریت زمان، هوش هیجانی و ارتباط با والدین.",
-    url: "https://noojavaneh.ir",
-    siteName: "نوجوانه",
+    url: "https://www.noojavaneh.ir",
+    siteName: "نوجوان",
     locale: "fa_IR",
     type: "website",
     images: [
@@ -64,13 +65,13 @@ export const metadata: Metadata = {
         url: "/course-banner.png",
         width: 1200,
         height: 630,
-        alt: "نوجوانه - مسیر تحول و رشد فردی نوجوانان",
+        alt: "نوجوان - مسیر تحول و رشد فردی نوجوانان",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "نوجوانه | پلتفرم تخصصی آموزش و رشد نوجوانان",
+    title: "نوجوان | پلتفرم تخصصی آموزش و رشد نوجوانان",
     description: "آموزش عادات موثر، مدیریت تمرکز، هوش هیجانی و مهارت‌های زندگی برای نوجوانان.",
     images: ["/course-banner.png"],
   },
@@ -91,24 +92,32 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@type": "EducationalOrganization",
-      "@id": "https://noojavaneh.ir/#organization",
-      "name": "نوجوانه",
-      "url": "https://noojavaneh.ir",
-      "logo": "https://noojavaneh.ir/course-banner.png",
-      "description": "پلتفرم تخصصی آموزش و رشد فردی نوجوانان، مهارت‌های زندگی، عادت‌سازی، تمرکز و همراهی مادران.",
-      "sameAs": []
-    },
-    {
       "@type": "WebSite",
-      "@id": "https://noojavaneh.ir/#website",
-      "url": "https://noojavaneh.ir",
-      "name": "نوجوانه",
+      "@id": "https://www.noojavaneh.ir/#website",
+      "url": "https://www.noojavaneh.ir/",
+      "name": "نوجوان",
+      "alternateName": [
+        "نوجوانه",
+        "پلتفرم نوجوان",
+        "noojavaneh.ir",
+        "www.noojavaneh.ir",
+        "noojavaneh"
+      ],
       "description": "پلتفرم جامع رشد، مهارت و تحول فردی نوجوانان",
       "publisher": {
-        "@id": "https://noojavaneh.ir/#organization"
+        "@id": "https://www.noojavaneh.ir/#organization"
       },
       "inLanguage": "fa-IR"
+    },
+    {
+      "@type": "EducationalOrganization",
+      "@id": "https://www.noojavaneh.ir/#organization",
+      "name": "نوجوان",
+      "alternateName": "نوجوانه",
+      "url": "https://www.noojavaneh.ir/",
+      "logo": "https://www.noojavaneh.ir/course-banner.png",
+      "description": "پلتفرم تخصصی آموزش و رشد فردی نوجوانان، مهارت‌های زندگی، عادت‌سازی، تمرکز و همراهی مادران.",
+      "sameAs": ["https://noojavaneh.ir/"]
     }
   ]
 };
