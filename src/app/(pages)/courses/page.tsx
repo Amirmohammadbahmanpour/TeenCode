@@ -2,6 +2,32 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import ChapterList from "./ChapterList";
 import Image from "next/image";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "دوره جامع مسیر تحول نوجوان | سرفصل‌ها و دروس",
+    description: "مسیر گام‌به‌گام رشد فردی نوجوان؛ شامل فصل‌های ذهنیت تحول، مهندسی عادت‌ها، مدیریت تمرکز، هوش هیجانی و استمرار موفقیت ویژه نوجوانان.",
+    keywords: [
+        "دوره نوجوان",
+        "آموزش نوجوانان",
+        "مسیر رشد نوجوان",
+        "عادت سازی نوجوان",
+        "مدیریت تمرکز نوجوان",
+        "هوش هیجانی نوجوان",
+        "روانشناسی رشد نوجوان",
+        "مهارتهای فردی نوجوان",
+    ],
+    alternates: {
+        canonical: "https://noojavaneh.ir/courses",
+    },
+    openGraph: {
+        title: "دوره جامع تحول و رشد فردی نوجوان | نوجوانه",
+        description: "نقشه راه اختصاصی رشد نوجوانان با متدهای آموزشی تعاملی، ارزیابی اولیه و نهایی و تمرین‌های کاربردی.",
+        url: "https://noojavaneh.ir/courses",
+        siteName: "نوجوانه",
+        type: "website",
+    },
+};
 
 // ========== تایپ‌ها ==========
 export interface Lesson {

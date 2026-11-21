@@ -5,21 +5,32 @@ import { Calendar, ArrowLeft, BookOpen, Sparkles } from "lucide-react";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "وبلاگ نوجوانه | مقالات آموزشی تربیت نوجوان",
-    description: "مقالات تخصصی در زمینه تربیت نوجوان، مهارت‌های فرزندپروری، روانشناسی کودک و نوجوان، و توسعه فردی برای مادران آگاه",
-    keywords: "تربیت نوجوان, فرزندپروری, روانشناسی کودک, مهارت‌های زندگی, توسعه فردی, مادران آگاه",
+    title: "وبلاگ تخصصی نوجوانه | مقالات روانشناسی، رشد و تربیت نوجوان",
+    description: "مجموعه مقالات تخصصی پیرامون دوران نوجوانی، رفتار با نوجوان، روانشناسی رشد، هوش هیجانی، استعدادیابی و آموزش والدین و نوجوانان.",
+    keywords: [
+        "وبلاگ نوجوان",
+        "تربیت نوجوان",
+        "روانشناسی نوجوان",
+        "فرزندپروری نوجوان",
+        "رفتار با نوجوان",
+        "مشکلات دوران بلوغ",
+        "مهارتهای فردی نوجوان",
+        "استعدادیابی نوجوانان",
+        "آموزش والدین نوجوان",
+        "انگیزه و اعتماد به نفس نوجوان",
+    ],
     authors: [{ name: "نوجوانه" }],
     openGraph: {
-        title: "وبلاگ نوجوانه | مقالات آموزشی",
-        description: "جدیدترین مقالات تربیت نوجوان و مهارت‌های فرزندپروری",
-        url: "https://teencode.ir/blog",
+        title: "وبلاگ نوجوانه | مقالات تخصصی رشد و تربیت نوجوان",
+        description: "جدیدترین راهکارها و مقالات روانشناسی و توسعه فردی برای نوجوانان و مادران",
+        url: "https://noojavaneh.ir/blog",
         siteName: "نوجوانه",
         images: [
             {
-                url: "/blog-og-image.jpg",
+                url: "/course-banner.png",
                 width: 1200,
                 height: 630,
-                alt: "وبلاگ نوجوانه ",
+                alt: "وبلاگ تخصصی نوجوانه",
             },
         ],
         locale: "fa_IR",
@@ -37,7 +48,7 @@ export const metadata: Metadata = {
         },
     },
     alternates: {
-        canonical: "https://teencode.ir/blog",
+        canonical: "https://noojavaneh.ir/blog",
     },
 };
 export const revalidate = 3600;

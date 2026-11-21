@@ -9,24 +9,24 @@ import FinalCTA from "@/components/final-cta";
 
 // ========== متادیتا برای سئو ==========
 export const metadata = {
-    title: "نوجوانه؛ همراه با مادران در فصل جوانه‌زدن نوجوانان",
+    title: "نوجوانه | پلتفرم تخصصی رشد، مهارت و تحول فردی نوجوانان",
     description:
-        "دوره جامع تربیت نوجوان و تحول شخصی برای مادران آگاه. با متدهای نوین آموزشی، مسیر رشد خود و فرزندتان را هموار کنید.",
+        "دوره جامع تربیت نوجوان، رشد فردی و تحول عادات برای نوجوانان و همراهی با مادران آگاه. با متدهای نوین آموزشی، مسیر موفقیت و شکوفایی استعدادهای نوجوان خود را بسازید.",
     keywords:
-        "تربیت نوجوان, آموزش مادران, فرزندپروری, تحول فردی, مشاوره خانواده",
+        "نوجوان, نوجوانان, تربیت نوجوان, آموزش نوجوان, رشد فردی نوجوان, مهارتهای زندگی نوجوانان, روانشناسی نوجوان, بلوغ نوجوان, مدیریت زمان و تمرکز, هوش هیجانی, عادت سازی نوجوان, فرزندپروری, آموزش مادران, هدف گذاری نوجوان, مشاوره نوجوان, نوجوان موفق",
     authors: [{ name: "نوجوانه" }],
     openGraph: {
-        title: "نوجوانه | مسیر تحول فردی مادران",
+        title: "نوجوانه | مسیر تحول و رشد فردی نوجوانان و مادران",
         description:
-            "به جمع مادران آگاه بپیوندید و مسیر رشد خود و فرزندتان را آغاز کنید",
-        url: "https://www.noojavaneh.ir",
+            "مسیر اختصاصی تحول نوجوانان؛ مهارت‌های تمرکز، عزت نفس، مدیریت زمان، هوش هیجانی و ارتباط با والدین.",
+        url: "https://noojavaneh.ir",
         siteName: "نوجوانه",
         images: [
             {
-                url: "/og-image.jpg",
+                url: "/course-banner.png",
                 width: 1200,
                 height: 630,
-                alt: "نوجوانه - آموزش و تربیت نوجوان",
+                alt: "نوجوانه - پلتفرم رشد و تربیت نوجوان",
             },
         ],
         locale: "fa_IR",
@@ -44,9 +44,64 @@ export const metadata = {
         },
     },
     alternates: {
-        canonical: "https://www.noojavaneh.ir",
+        canonical: "https://noojavaneh.ir",
     },
 };
+
+const homeSchemas = [
+    {
+        "@context": "https://schema.org",
+        "@type": "Course",
+        "name": "مسیر جامع تحول و توانمندسازی نوجوان",
+        "description": "دوره تخصصی رشد فردی نوجوانان شامل سرفصل‌های ذهنیت تحول، مهندسی عادات، مدیریت تمرکز، هوش هیجانی و استمرار موفقیت.",
+        "provider": {
+            "@type": "Organization",
+            "name": "نوجوانه",
+            "sameAs": "https://noojavaneh.ir"
+        },
+        "educationalLevel": "نوجوان و والدین",
+        "inLanguage": "fa",
+        "isAccessibleForFree": true
+    },
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "آیا برای شرکت در دوره نوجوانه نیاز به پیش نیاز خاصی وجود دارد؟",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "خیر، در این دوره آموزشی شما نیاز به هیچ پیش نیازی ندارید و با گذراندن ارزیابی اولیه وارد دوره می‌شوید."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "دوره نوجوانه شامل چه مباحثی برای رشد نوجوان است؟",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "این دوره شامل تغییر ذهنیت، عادات روزانه، مدیریت تمرکز، هوش هیجانی و مهارت‌های بنیادین برای تحول شخصی نوجوانان است."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "چگونه می‌توان در دوره آموزشی نوجوانه ثبت‌نام کرد؟",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "پس از ثبت‌نام با شماره موبایل در سایت، می‌توانید ارزیابی اولیه را انجام داده و مراحل ورود به دوره‌ها را ادامه دهید."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "آیا آموزش‌های نوجوانه به بهبود رابطه والدین و نوجوان کمک می‌کند؟",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "بله، نوجوانه با رویکرد توانمندسازی نوجوان و همراهی با مادران، مهارت‌های درک متقابل دوران نوجوانی و هم‌افزایی خانواده را تقویت می‌کند."
+                }
+            }
+        ]
+    }
+];
 
 // ========== تایپ‌ها ==========
 interface UserProfile {
@@ -190,6 +245,10 @@ export default async function Home() {
 
     return (
         <div className="w-full max-w-full overflow-x-hidden">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(homeSchemas) }}
+            />
             {/* ==================== Hero ==================== */}
             <section
                 className="w-full max-w-full overflow-hidden bg-cream-soft dark:bg-stone-950 border-b border-stone-200/20 px-3 sm:px-5 md:px-8 lg:px-12 xl:px-16 pt-4 pb-7 sm:pt-6 sm:pb-10 lg:pt-10 lg:pb-16 xl:pb-20 transition-colors duration-300"

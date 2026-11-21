@@ -63,13 +63,13 @@ export async function generateMetadata({
         description,
 
         alternates: {
-            canonical: `https://www.noojavaneh.ir/lessons/${id}`,
+            canonical: `https://noojavaneh.ir/courses/lesson/${id}`,
         },
 
         openGraph: {
             title,
             description,
-            url: `https://www.noojavaneh.ir/lessons/${id}`,
+            url: `https://noojavaneh.ir/courses/lesson/${id}`,
             siteName: "نوجوانه",
             locale: "fa_IR",
             type: "article",
@@ -106,6 +106,36 @@ export default async function Page({
     params,
 }: PageProps) {
     const { id } = await params;
+    const lesson = await getLesson(id);
 
-    return <LessonPage />;
+    const lessonSchema = lesson
+        ? {
+              "@context": "https://schema.org",
+              "@type": "LearningResource",
+              "name": lesson.title,
+              "description": lesson.description || `درس آموزشی ${lesson.title} در پلتفرم نوجوانه`,
+              "learningResourceType": "Lesson",
+              "url": `https://noojavaneh.ir/courses/lesson/${id}`,
+              "provider": {
+                  "@type": "Organization",
+                  "name": "نوجوانه",
+                  "url": "https://noojavaneh.ir",
+              },
+              "inLanguage": "fa",
+          }
+        : null;
+
+    return (
+        <>
+            {lessonSchema && (
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{
+                        __html: JSON.stringify(lessonSchema),
+                    }}
+                />
+            )}
+            <LessonPage />
+        </>
+    );
 }

@@ -23,18 +23,21 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
         const post = await res.json();
         
         return {
-            title: `${post.title} | تین کد`,
-            description: post.description?.substring(0, 160) || "مطلب آموزشی از تین کد",
-            keywords: `${post.title}, تربیت نوجوان, آموزش والدین, فرزندپروری`,
-            authors: [{ name: post.author?.name || "تین کد" }],
+            title: `${post.title} | وبلاگ نوجوانه`,
+            description: post.description?.substring(0, 160) || "مقاله تخصصی پیرامون رشد و تربیت نوجوان در نوجوانه",
+            keywords: `${post.title}, نوجوان, نوجوانان, تربیت نوجوان, آموزش والدین, فرزندپروری, روانشناسی نوجوان`,
+            authors: [{ name: post.author?.name || "تحریریه نوجوانه" }],
+            alternates: {
+                canonical: `https://noojavaneh.ir/blog/${post.id}`,
+            },
             openGraph: {
                 title: post.title,
                 description: post.description?.substring(0, 160),
-                url: `https://teencode.ir/blog/${post.id}`,
-                siteName: "تین کد",
+                url: `https://noojavaneh.ir/blog/${post.id}`,
+                siteName: "نوجوانه",
                 images: [
                     {
-                        url: post.image_url || "/default-og-image.jpg",
+                        url: post.image_url || "/course-banner.png",
                         width: 1200,
                         height: 630,
                         alt: post.title,
@@ -43,13 +46,13 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
                 locale: "fa_IR",
                 type: "article",
                 publishedTime: post.created_at,
-                authors: [post.author?.name || "تین کد"],
+                authors: [post.author?.name || "تحریریه نوجوانه"],
             },
             twitter: {
                 card: "summary_large_image",
                 title: post.title,
                 description: post.description?.substring(0, 160),
-                images: [post.image_url || "/default-og-image.jpg"],
+                images: [post.image_url || "/course-banner.png"],
             },
             robots: {
                 index: true,
@@ -177,8 +180,41 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     
     const formattedDate = new Date(post.created_at).toLocaleDateString("fa-IR");
 
+    const articleSchema = {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": post.title,
+        "description": post.description || post.title,
+        "image": post.image_url ? [post.image_url] : ["https://noojavaneh.ir/course-banner.png"],
+        "datePublished": post.created_at,
+        "dateModified": (post as any).updated_at || post.created_at,
+        "author": {
+            "@type": "Person",
+            "name": post.author?.name || "تحریریه نوجوانه",
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "نوجوانه",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://noojavaneh.ir/course-banner.png",
+            },
+        },
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": `https://noojavaneh.ir/blog/${id}`,
+        },
+        "inLanguage": "fa",
+    };
+
     return (
         <div className="min-h-screen bg-[#fafaf9] dark:bg-[#0c0a09] pb-10 text-right" dir="rtl">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify(articleSchema),
+                }}
+            />
             <div className="max-w-5xl mx-auto p-4 md:p-6 pt-8 md:pt-12">
                 
                 {/* Back Button */}
