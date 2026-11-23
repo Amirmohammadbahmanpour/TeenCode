@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { auth } from "@/lib/auth";
 import api from "@/lib/axios";
+import UserTickets from "@/components/dashboard/UserTickets";
 
 // ========== تایپ‌ها ==========
 
@@ -694,6 +695,9 @@ export default function Dashboard() {
 
                     </section>
                 )}
+
+                {/* ================= پشتیبانی و تیکت‌ها ================= */}
+                <UserTickets />
 
             </div>
         </div>

@@ -11,6 +11,7 @@ import {
     Menu,
     BookOpen,
     LucideIcon,
+    LifeBuoy,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -126,6 +127,13 @@ export default function AdminSidebar() {
                         href="/x7k9m2p4/users"
                         icon={Users}
                         label="کاربران"
+                        onClick={closeSidebar}
+                    />
+
+                    <AdminNavLink
+                        href="/x7k9m2p4/tickets"
+                        icon={LifeBuoy}
+                        label="تیکت‌ها و پشتیبانی"
                         onClick={closeSidebar}
                     />
 
