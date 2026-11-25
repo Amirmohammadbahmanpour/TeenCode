@@ -58,6 +58,7 @@ export interface UserItem {
 
 interface AdminUsersTableProps {
     initialUsers: UserItem[];
+    initialError?: string | null;
 }
 
 function formatDate(dateStr?: string | null) {
@@ -74,13 +75,34 @@ function formatDate(dateStr?: string | null) {
     }
 }
 
-export function AdminUsersTable({ initialUsers }: AdminUsersTableProps) {
+export function AdminUsersTable({ initialUsers, initialError = null }: AdminUsersTableProps) {
     const router = useRouter();
     const [users, setUsers] = useState<UserItem[]>(initialUsers);
+    const [fetchError, setFetchError] = useState<string | null>(initialError);
+    const [reloading, setReloading] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
     const [selectedUser, setSelectedUser] = useState<UserItem | null>(null);
     const [actionLoading, setActionLoading] = useState(false);
+
+    const handleReloadUsers = async () => {
+        try {
+            setReloading(true);
+            setFetchError(null);
+            const res = await api.get<UserItem[]>("/admin/users");
+            if (Array.isArray(res.data)) {
+                setUsers(res.data);
+            }
+        } catch (err: any) {
+            setFetchError(
+                err?.response?.data?.message ||
+                    err?.message ||
+                    "خطا در دریافت لیست کاربران"
+            );
+        } finally {
+            setReloading(false);
+        }
+    };
 
     // تغییر نقش
     const handleToggleRole = async (user: UserItem, e?: React.MouseEvent) => {
@@ -163,6 +185,22 @@ export function AdminUsersTable({ initialUsers }: AdminUsersTableProps) {
 
     return (
         <div className="space-y-4">
+            {fetchError && (
+                <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs sm:text-sm text-red-700 dark:text-red-300">
+                    <div className="break-all">
+                        <span className="font-bold">خطا در دریافت کاربران از سرور: </span>
+                        <span dir="ltr">{fetchError}</span>
+                    </div>
+                    <button
+                        onClick={handleReloadUsers}
+                        disabled={reloading}
+                        className="px-4 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold shrink-0 disabled:opacity-50"
+                    >
+                        {reloading ? "در حال تلاش..." : "تلاش مجدد"}
+                    </button>
+                </div>
+            )}
+
             {/* نوار جستجو و فیلتر */}
             <div className="bg-white dark:bg-stone-900 p-4 rounded-2xl border border-stone-200 dark:border-stone-800 flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between shadow-sm">
                 <div className="flex-1 relative">

@@ -9,22 +9,30 @@ const API_URL =
     process.env.NEXT_PUBLIC_API_URL ||
     "http://127.0.0.1:8000/api";
 
-async function getUsers(token: string): Promise<UserItem[]> {
+async function getUsers(token: string): Promise<{ users: UserItem[]; error: string | null }> {
     try {
         const response = await fetch(`${API_URL}/admin/users`, {
             headers: {
                 Authorization: `Bearer ${token}`,
+                Accept: "application/json",
             },
             cache: "no-store",
         });
 
-        if (!response.ok) return [];
+        if (!response.ok) {
+            const errText = await response.text().catch(() => "");
+            console.error("Error fetching users:", response.status, errText);
+            return {
+                users: [],
+                error: `خطای سرور (${response.status}): ${errText.slice(0, 200)}`,
+            };
+        }
 
         const data = await response.json();
-        return data;
-    } catch (error) {
+        return { users: Array.isArray(data) ? data : [], error: null };
+    } catch (error: any) {
         console.error("Error fetching users:", error);
-        return [];
+        return { users: [], error: error?.message || "خطا در ارتباط با سرور" };
     }
 }
 
@@ -61,7 +69,7 @@ export default async function AdminUsers() {
         redirect("/dashboard");
     }
 
-    const users = await getUsers(token);
+    const { users, error } = await getUsers(token);
 
     return (
         <div
@@ -83,7 +91,7 @@ export default async function AdminUsers() {
             </div>
 
             {/* Interactive Users Table with Modal */}
-            <AdminUsersTable initialUsers={users || []} />
+            <AdminUsersTable initialUsers={users || []} initialError={error} />
         </div>
     );
 }
