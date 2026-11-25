@@ -5,10 +5,10 @@ export default function AuthLayout({
 }) {
     return (
         <div
-            className="w-full h-full min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden"
+            className="w-full min-h-full flex flex-col justify-start"
             dir="rtl"
         >
-            <div className="w-full h-full">
+            <div className="w-full flex-1">
                 {children}
             </div>
         </div>

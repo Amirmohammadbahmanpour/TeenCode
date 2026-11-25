@@ -340,10 +340,10 @@ export default function CompleteProfile() {
 
     return (
         <div
-            className="min-h-screen flex items-center justify-center bg-stone-50 dark:bg-stone-950 p-6"
+            className="w-full min-h-screen flex justify-center items-start bg-stone-50 dark:bg-stone-950 py-8 sm:py-12 px-4 sm:px-6"
             dir="rtl"
         >
-            <div className="w-full max-w-xl bg-white dark:bg-stone-900 p-8 md:p-12 rounded-[2.5rem] shadow-xl border border-stone-200/50 dark:border-stone-800/50">
+            <div className="w-full max-w-xl bg-white dark:bg-stone-900 p-6 sm:p-8 md:p-12 rounded-[2rem] sm:rounded-[2.5rem] shadow-xl border border-stone-200/50 dark:border-stone-800/50 mb-16 sm:mb-20">
 
                 <div className="text-center mb-8">
                     <h2 className="text-3xl font-black text-stone-800 dark:text-stone-100 italic">
@@ -774,10 +774,11 @@ export default function CompleteProfile() {
                     </div>
 
                     {/* دکمه */}
-                    <div className="md:col-span-2 pt-4">
+                    <div className="md:col-span-2 pt-6 pb-2">
                         <button
+                            type="submit"
                             disabled={loading}
-                            className="w-full bg-sage-600 hover:bg-sage-700 text-white py-4 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2 shadow-lg active:scale-[0.98] disabled:opacity-50"
+                            className="w-full bg-sage-600 hover:bg-sage-700 text-white py-4 rounded-2xl font-bold text-base sm:text-lg transition-all flex items-center justify-center gap-2 shadow-lg active:scale-[0.98] disabled:opacity-50 cursor-pointer"
                         >
                             {loading ? (
                                 <Loader2
