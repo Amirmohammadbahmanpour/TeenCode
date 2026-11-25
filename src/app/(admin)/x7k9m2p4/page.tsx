@@ -1,12 +1,11 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { DeletePostButton } from "@/components/admin/DeletePostButton";
-
-export const dynamic = "force-dynamic";
-
-const API_URL =
-    process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
+import { AdminGuard } from "@/components/admin/AdminGuard";
+import api from "@/lib/axios";
+import { Loader2 } from "lucide-react";
 
 interface Post {
     id: string;
@@ -16,58 +15,37 @@ interface Post {
     created_at: string;
 }
 
-async function getPosts(token: string): Promise<Post[]> {
-    try {
-        const response = await fetch(`${API_URL}/admin/posts`, {
-            headers: { Authorization: `Bearer ${token}` },
-            cache: "no-store",
-        });
+function AdminPostsContent() {
+    const [posts, setPosts] = useState<Post[]>([]);
+    const [loading, setLoading] = useState(true);
 
-        if (!response.ok) return [];
+    useEffect(() => {
+        const fetchPosts = async () => {
+            try {
+                const res = await api.get<Post[]>("/admin/posts");
+                if (Array.isArray(res.data)) {
+                    setPosts(res.data);
+                }
+            } catch (error) {
+                console.error("Error fetching posts:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error("Error fetching posts:", error);
-        return [];
+        fetchPosts();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="py-20 flex justify-center">
+                <Loader2 className="animate-spin text-sage-600" size={32} />
+            </div>
+        );
     }
-}
-
-async function checkAdmin(token: string): Promise<boolean> {
-    try {
-        const response = await fetch(`${API_URL}/user`, {
-            headers: { Authorization: `Bearer ${token}` },
-            cache: "no-store",
-        });
-
-        if (!response.ok) return false;
-
-        const userData = await response.json();
-        return userData.profile?.role === "admin";
-    } catch {
-        return false;
-    }
-}
-
-export default async function AdminPosts() {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("auth_token")?.value;
-
-    if (!token) {
-        redirect("/login");
-    }
-
-    const isAdmin = await checkAdmin(token);
-
-    if (!isAdmin) {
-        redirect("/dashboard");
-    }
-
-    const posts = await getPosts(token);
 
     return (
         <div className="space-y-6 text-right" dir="rtl">
-
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                 <h1 className="text-2xl sm:text-3xl font-black text-stone-800 dark:text-stone-100">
@@ -75,7 +53,7 @@ export default async function AdminPosts() {
                 </h1>
 
                 <Link
-                    href="/admin/posts/new"
+                    href="/x7k9m2p4/posts"
                     className="w-full sm:w-auto text-center bg-sage-600 text-white px-5 py-3 rounded-xl text-sm font-bold hover:bg-sage-700 transition-all"
                 >
                     + مقاله جدید
@@ -133,16 +111,14 @@ export default async function AdminPosts() {
                                                     : "bg-yellow-100 text-yellow-700"
                                             }`}
                                         >
-                                            {post.is_published
-                                                ? "منتشر شده"
-                                                : "پیش‌نویس"}
+                                            {post.is_published ? "منتشر شده" : "پیش‌نویس"}
                                         </span>
                                     </td>
 
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-4">
                                             <Link
-                                                href={`/admin/posts/edit/${post.id}`}
+                                                href={`/x7k9m2p4/posts/edit/${post.id}`}
                                                 className="text-sage-600 hover:text-sage-700 text-sm font-bold transition-colors"
                                             >
                                                 ویرایش
@@ -168,7 +144,6 @@ export default async function AdminPosts() {
                         key={post.id}
                         className="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 p-4 shadow-sm"
                     >
-                        {/* Title */}
                         <div className="mb-4">
                             <p className="text-xs text-stone-400 mb-1">
                                 عنوان مقاله
@@ -182,9 +157,7 @@ export default async function AdminPosts() {
                             </Link>
                         </div>
 
-                        {/* Info */}
                         <div className="flex flex-wrap items-center gap-3 text-sm mb-4">
-
                             <span className="text-stone-500 dark:text-stone-400">
                                 {new Date(post.created_at).toLocaleDateString("fa-IR")}
                             </span>
@@ -196,16 +169,13 @@ export default async function AdminPosts() {
                                         : "bg-yellow-100 text-yellow-700"
                                 }`}
                             >
-                                {post.is_published
-                                    ? "منتشر شده"
-                                    : "پیش‌نویس"}
+                                {post.is_published ? "منتشر شده" : "پیش‌نویس"}
                             </span>
                         </div>
 
-                        {/* Actions */}
                         <div className="flex items-center gap-4 pt-3 border-t border-stone-100 dark:border-stone-800">
                             <Link
-                                href={`/admin/posts/edit/${post.id}`}
+                                href={`/x7k9m2p4/posts/edit/${post.id}`}
                                 className="text-sage-600 hover:text-sage-700 text-sm font-bold transition-colors"
                             >
                                 ویرایش
@@ -232,3 +202,10 @@ export default async function AdminPosts() {
     );
 }
 
+export default function AdminPosts() {
+    return (
+        <AdminGuard>
+            <AdminPostsContent />
+        </AdminGuard>
+    );
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     Search,
     User,
@@ -59,6 +59,7 @@ export interface UserItem {
 interface AdminUsersTableProps {
     initialUsers: UserItem[];
     initialError?: string | null;
+    autoFetch?: boolean;
 }
 
 function formatDate(dateStr?: string | null) {
@@ -75,11 +76,11 @@ function formatDate(dateStr?: string | null) {
     }
 }
 
-export function AdminUsersTable({ initialUsers, initialError = null }: AdminUsersTableProps) {
+export function AdminUsersTable({ initialUsers, initialError = null, autoFetch = false }: AdminUsersTableProps) {
     const router = useRouter();
     const [users, setUsers] = useState<UserItem[]>(initialUsers);
     const [fetchError, setFetchError] = useState<string | null>(initialError);
-    const [reloading, setReloading] = useState(false);
+    const [reloading, setReloading] = useState(autoFetch);
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
     const [selectedUser, setSelectedUser] = useState<UserItem | null>(null);
@@ -103,6 +104,12 @@ export function AdminUsersTable({ initialUsers, initialError = null }: AdminUser
             setReloading(false);
         }
     };
+
+    useEffect(() => {
+        if (autoFetch) {
+            handleReloadUsers();
+        }
+    }, [autoFetch]);
 
     // تغییر نقش
     const handleToggleRole = async (user: UserItem, e?: React.MouseEvent) => {
@@ -261,7 +268,13 @@ export function AdminUsersTable({ initialUsers, initialError = null }: AdminUser
                         </thead>
 
                         <tbody className="divide-y divide-stone-100 dark:divide-stone-800 text-xs sm:text-sm">
-                            {filteredUsers.length === 0 ? (
+                            {reloading && users.length === 0 ? (
+                                <tr>
+                                    <td colSpan={6} className="py-12 text-center text-stone-400">
+                                        در حال دریافت لیست کاربران...
+                                    </td>
+                                </tr>
+                            ) : filteredUsers.length === 0 ? (
                                 <tr>
                                     <td colSpan={6} className="py-12 text-center text-stone-400">
                                         کاربری با این مشخصات یافت نشد.
